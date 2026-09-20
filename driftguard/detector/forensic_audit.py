@@ -13,15 +13,18 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from driftguard.agent.memory_backend import MemoryBackend
 from driftguard.detector.classifier import DriftGuardClassifier, CLASS_NAMES
 from driftguard.detector.features import FeatureExtractor
 from driftguard.provenance.schema import ProvenanceRecord
-from driftguard.provenance.enforcement import MemoryClass
+
+if TYPE_CHECKING:
+    # Type-hint only: avoid a hard runtime dependency on driftguard.agent
+    # (and therefore on langgraph/langchain) just to run a forensic audit.
+    from driftguard.agent.memory_backend import MemoryBackend
 
 logger = logging.getLogger(__name__)
 

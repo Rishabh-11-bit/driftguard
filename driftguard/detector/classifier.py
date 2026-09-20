@@ -107,7 +107,6 @@ class DriftGuardClassifier:
                 ("clf",    LogisticRegression(
                     max_iter=1000,
                     class_weight="balanced",
-                    multi_class="multinomial",
                     solver="lbfgs",
                     random_state=self.random_state,
                 )),
@@ -206,12 +205,18 @@ class DriftGuardClassifier:
         if step is None:
             return None
 
-        # CalibratedClassifierCV wraps the base estimator
-        if hasattr(step, "estimator"):
-            step = step.estimator
-        if hasattr(step, "estimators_"):
-            # RandomForestClassifier
-            importances = step.feature_importances_
+        # CalibratedClassifierCV fits one clone of the base estimator per CV
+        # fold (in `calibrated_classifiers_`); `step.estimator` is just the
+        # original *unfitted* prototype, so average importances across folds.
+        if hasattr(step, "calibrated_classifiers_"):
+            fold_importances = [
+                cc.estimator.feature_importances_
+                for cc in step.calibrated_classifiers_
+                if hasattr(cc.estimator, "feature_importances_")
+            ]
+            if not fold_importances:
+                return None
+            importances = np.mean(fold_importances, axis=0)
         elif hasattr(step, "feature_importances_"):
             importances = step.feature_importances_
         else:

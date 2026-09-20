@@ -236,7 +236,9 @@ def plot_roc_curves(
         if y_bin.sum() == 0:
             continue
         fpr, tpr, _ = roc_curve(y_bin, y_proba[:, cls_idx])
-        auc_val = np.trapz(tpr, fpr)
+        # np.trapz was removed in NumPy 2.0, renamed to np.trapezoid.
+        trapz_fn = getattr(np, "trapezoid", None) or np.trapz
+        auc_val = trapz_fn(tpr, fpr)
         ax.plot(fpr, tpr, color=color, lw=2, label=f"{cls_name} (AUC={auc_val:.3f})")
 
     ax.plot([0, 1], [0, 1], "k--", lw=1.5, label="Random (AUC=0.50)")

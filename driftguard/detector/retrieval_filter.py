@@ -8,9 +8,12 @@ Author: Rishabh Gaikwad (1032231674) — Objective 3
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from driftguard.agent.memory_backend import MemoryBackend
+if TYPE_CHECKING:
+    # Type-hint only: avoid a hard runtime dependency on driftguard.agent
+    # (and therefore on langgraph/langchain) just to do retrieval filtering.
+    from driftguard.agent.memory_backend import MemoryBackend
 
 logger = logging.getLogger(__name__)
 

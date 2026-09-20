@@ -305,7 +305,11 @@ class EnforcementPolicy:
         quarantine_queue: BaseReviewQueue | None = None,
         malicious_threshold: float = 0.5,
     ) -> None:
-        self.queue = quarantine_queue or make_queue_from_env()
+        # NOTE: `quarantine_queue or make_queue_from_env()` would be wrong here —
+        # BaseReviewQueue defines __len__, so an empty-but-valid queue (the
+        # common case for a freshly created one) is falsy and would be
+        # silently discarded.
+        self.queue = quarantine_queue if quarantine_queue is not None else make_queue_from_env()
         self.malicious_threshold = malicious_threshold
 
     def apply(
