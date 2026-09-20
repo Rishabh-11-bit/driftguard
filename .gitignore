@@ -11,6 +11,7 @@ venv/
 
 # Generated artefacts (regenerate via scripts/)
 data/*.jsonl
+data/faiss_index/
 models/*.pkl
 results/*.json
 results/*.png

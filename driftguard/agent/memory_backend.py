@@ -87,7 +87,11 @@ class FAISSMemoryBackend(MemoryBackend):
             or os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
         )
         self._encoder = SentenceTransformer(self._model_name)
-        self._dim = self._encoder.get_sentence_embedding_dimension()
+        # get_sentence_embedding_dimension() was renamed to get_embedding_dimension()
+        # in newer sentence-transformers; support both.
+        get_dim = getattr(self._encoder, "get_embedding_dimension", None) or \
+            self._encoder.get_sentence_embedding_dimension
+        self._dim = get_dim()
 
         self._index_file = self.index_path / "index.faiss"
         self._meta_file  = self.index_path / "metadata.json"

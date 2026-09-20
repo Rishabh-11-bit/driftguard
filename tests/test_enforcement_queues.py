@@ -63,6 +63,53 @@ class TestInMemoryReviewQueue:
         assert queue.list_all()[0].review_decision == "reject"
 
 
+class TestRedisReviewQueue:
+    """
+    Integration test against a real Redis instance (docker-compose up redis).
+    Skipped automatically if Redis isn't reachable on REDIS_URL / localhost:6379.
+    """
+
+    @pytest.fixture
+    def queue(self):
+        from driftguard.provenance.enforcement import RedisReviewQueue
+
+        try:
+            q = RedisReviewQueue(hash_key="driftguard:test:quarantine")
+            q._client.ping()
+        except Exception:
+            pytest.skip("Redis is not reachable on REDIS_URL / localhost:6379")
+        yield q
+        q._client.delete(q._hash_key)
+
+    def test_enqueue_and_list_pending(self, queue):
+        entry = _entry()
+        queue.enqueue(entry)
+        pending = queue.list_pending()
+        assert len(pending) == 1
+        assert pending[0].quarantine_id == entry.quarantine_id
+
+    def test_mark_reviewed_persists_in_redis(self, queue):
+        entry = _entry()
+        queue.enqueue(entry)
+        queue.mark_reviewed(entry.quarantine_id, "reject")
+
+        assert queue.list_pending() == []
+        assert queue.list_all()[0].review_decision == "reject"
+
+        # Re-read via a fresh queue instance to prove it's server-side state, not client-cached.
+        from driftguard.provenance.enforcement import RedisReviewQueue
+        reread = RedisReviewQueue(hash_key="driftguard:test:quarantine")
+        assert reread.list_all()[0].review_decision == "reject"
+
+    def test_mark_reviewed_unknown_id_raises(self, queue):
+        with pytest.raises(KeyError):
+            queue.mark_reviewed("does-not-exist", "approve")
+
+    def test_make_queue_from_env_selects_redis(self, queue):
+        selected = make_queue_from_env({"QUARANTINE_BACKEND": "redis"})
+        assert type(selected).__name__ == "RedisReviewQueue"
+
+
 class TestMakeQueueFromEnv:
     def test_defaults_to_jsonl(self, tmp_path):
         path = tmp_path / "q.jsonl"
