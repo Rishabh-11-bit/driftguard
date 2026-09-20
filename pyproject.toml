@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "driftguard"
+version = "0.1.0"
+description = "DriftGuard — Distinguishing Malicious Memory Poisoning from Benign Personalisation Drift in LLM Agents"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Tanisha Talathi", email = "tanisha.talathi@mitwpu.edu.in" },
+    { name = "Aryaan Sethi",    email = "aryaan.sethi@mitwpu.edu.in" },
+    { name = "Rishabh Gaikwad", email = "rishabh.gaikwad@mitwpu.edu.in" },
+]
+keywords = ["llm", "memory", "security", "adversarial", "langchain", "langgraph"]
+license = { text = "MIT" }
+
+dependencies = [
+    # Agent & memory
+    "langgraph>=0.2.0",
+    "langchain>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langchain-community>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-ollama>=0.2.0",
+    # Vector stores
+    "faiss-cpu>=1.8.0",
+    "chromadb>=0.5.0",
+    # Embeddings & NLP
+    "sentence-transformers>=3.0.0",
+    "transformers>=4.40.0",
+    # ML / evaluation
+    "scikit-learn>=1.5.0",
+    "numpy>=1.26.0",
+    "pandas>=2.2.0",
+    "matplotlib>=3.9.0",
+    "seaborn>=0.13.0",
+    # Utilities
+    "pydantic>=2.7.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.7.0",
+    "typer>=0.12.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+torch = [
+    "torch>=2.3.0",
+]
+redis = [
+    "redis>=5.0.0",
+]
+dev = [
+    "ipykernel",
+    "jupyter",
+    "black",
+    "ruff",
+    "mypy",
+]
+
+[project.scripts]
+driftguard-demo    = "scripts.demo_agent:app"
+driftguard-bench   = "scripts.generate_benchmark:app"
+driftguard-train   = "scripts.train_detector:app"
+driftguard-eval    = "scripts.run_eval:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["driftguard", "eval", "scripts"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
