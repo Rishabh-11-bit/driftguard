@@ -1,0 +1,11 @@
+{
+  "agentpoison": {
+    "n": 100,
+    "detection_rate": 0.62
+  },
+  "minja": {
+    "n": 100,
+    "detection_rate": 0.35
+  },
+  "_mean_detection_rate": 0.485
+}

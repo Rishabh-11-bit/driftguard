@@ -1,0 +1,108 @@
+{
+  "detector_name": "DriftGuard (held-out)",
+  "eval_time_sec": 0.25554829998873174,
+  "FAR": 0.0,
+  "MAR": 0.0,
+  "accuracy": 1.0,
+  "f1_macro": 0.3333333333333333,
+  "roc_auc_macro": NaN,
+  "confusion_matrix": [
+    [
+      200,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ]
+  ],
+  "classification_report": {
+    "malicious": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "benign_drift": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
+    "ordinary_learning": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 0.3333333333333333,
+      "recall": 0.3333333333333333,
+      "f1-score": 0.3333333333333333,
+      "support": 200.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    }
+  },
+  "extended": {
+    "balanced_accuracy": 1.0,
+    "mcc": 0.0,
+    "cohen_kappa": NaN,
+    "attack_tpr": 1.0,
+    "attack_fpr": 0.0,
+    "attack_tnr": 0.0,
+    "attack_precision": 1.0,
+    "attack_f2": 1.0,
+    "attack_containment_rate": 1.0,
+    "drift_preservation_rate": null,
+    "drift_recognition_rate": null,
+    "ordinary_passthrough_rate": null,
+    "legit_quarantine_rate": null,
+    "expected_cost": 0.0,
+    "admit_all_cost": 10.0,
+    "cost_reduction": 1.0,
+    "confidence_intervals": {
+      "accuracy": [
+        1.0,
+        1.0
+      ],
+      "FAR": [
+        0.0,
+        0.0
+      ],
+      "MAR": [
+        0.0,
+        0.0
+      ]
+    },
+    "brier_score": 0.007544798078971863,
+    "ece": 0.038298158383925945,
+    "malicious_pr_auc": 1.0,
+    "per_family": {
+      "indirect_tool_injection": {
+        "n": 100,
+        "detection_rate": 1.0,
+        "to_benign_drift": 0.0,
+        "to_ordinary": 0.0
+      },
+      "slow_drip": {
+        "n": 100,
+        "detection_rate": 1.0,
+        "to_benign_drift": 0.0,
+        "to_ordinary": 0.0
+      }
+    }
+  }
+}

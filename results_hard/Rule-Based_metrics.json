@@ -1,0 +1,108 @@
+{
+  "detector_name": "Rule-Based",
+  "eval_time_sec": 3.659998765215278e-05,
+  "FAR": 0.375,
+  "MAR": 0.0,
+  "accuracy": 0.5583333333333333,
+  "f1_macro": 0.4425657541599571,
+  "roc_auc_macro": 0.6687500000000001,
+  "confusion_matrix": [
+    [
+      40,
+      0,
+      0
+    ],
+    [
+      15,
+      0,
+      25
+    ],
+    [
+      13,
+      0,
+      27
+    ]
+  ],
+  "classification_report": {
+    "malicious": {
+      "precision": 0.5882352941176471,
+      "recall": 1.0,
+      "f1-score": 0.7407407407407407,
+      "support": 40.0
+    },
+    "benign_drift": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 40.0
+    },
+    "ordinary_learning": {
+      "precision": 0.5192307692307693,
+      "recall": 0.675,
+      "f1-score": 0.5869565217391305,
+      "support": 40.0
+    },
+    "accuracy": 0.5583333333333333,
+    "macro avg": {
+      "precision": 0.3691553544494721,
+      "recall": 0.5583333333333333,
+      "f1-score": 0.4425657541599571,
+      "support": 120.0
+    },
+    "weighted avg": {
+      "precision": 0.3691553544494722,
+      "recall": 0.5583333333333333,
+      "f1-score": 0.442565754159957,
+      "support": 120.0
+    }
+  },
+  "extended": {
+    "balanced_accuracy": 0.5583333333333333,
+    "mcc": 0.3932224164239375,
+    "cohen_kappa": 0.3375,
+    "attack_tpr": 1.0,
+    "attack_fpr": 0.35,
+    "attack_tnr": 0.65,
+    "attack_precision": 0.5882352941176471,
+    "attack_f2": 0.8771929824561404,
+    "attack_containment_rate": 1.0,
+    "drift_preservation_rate": 0.625,
+    "drift_recognition_rate": 0.0,
+    "ordinary_passthrough_rate": 0.675,
+    "legit_quarantine_rate": 0.35,
+    "expected_cost": 0.5875,
+    "admit_all_cost": 3.5,
+    "cost_reduction": 0.8321428571428571,
+    "confidence_intervals": {
+      "accuracy": [
+        0.4666666666666667,
+        0.6416666666666667
+      ],
+      "FAR": [
+        0.22493055555555558,
+        0.5144720496894408
+      ],
+      "MAR": [
+        0.0,
+        0.0
+      ]
+    },
+    "brier_score": 0.6783333333333333,
+    "ece": 0.2416666666666668,
+    "malicious_pr_auc": 0.5882352941176471,
+    "per_family": {
+      "agentpoison": {
+        "n": 21,
+        "detection_rate": 1.0,
+        "to_benign_drift": 0.0,
+        "to_ordinary": 0.0
+      },
+      "minja": {
+        "n": 19,
+        "detection_rate": 1.0,
+        "to_benign_drift": 0.0,
+        "to_ordinary": 0.0
+      }
+    }
+  }
+}

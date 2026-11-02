@@ -34,6 +34,7 @@ from eval.metrics import (
     plot_family_breakdown,
 )
 from eval.baselines.rule_based import RuleBasedDetector
+from eval.extended_metrics import print_extended_report
 
 console = Console()
 app = typer.Typer(help="Run the full DriftGuard evaluation suite.")
@@ -73,6 +74,7 @@ def main(
     console.print("\n[bold]── DriftGuard Detector ──[/bold]")
     dg_result = harness.evaluate_driftguard(clf, X_test, y_test, families_test)
     print_metrics_report(dg_result.metrics)
+    print_extended_report(dg_result.metrics["extended"])
     harness.save_results(dg_result, out)
 
     plot_confusion_matrix(
@@ -109,7 +111,27 @@ def main(
         p.update(t, description="✓ Held-out evaluation complete", completed=True)
 
     print_metrics_report(held_result.metrics)
+    print_extended_report(held_result.metrics["extended"])
     harness.save_results(held_result, out)
+    gap = harness.generalisation_gap(dg_result, held_result)
+    console.print(
+        f"  Generalisation gap: MAR {gap['mar_gap']:+.4f}  "
+        f"attack-recall {-gap['attack_recall_gap']:+.4f}  accuracy {-gap['accuracy_gap']:+.4f}"
+    )
+
+    # ── Leave-one-family-out ─────────────────────────────────
+    console.print("\n[bold]── Leave-One-Attack-Family-Out ──[/bold]")
+    from scripts.train_detector import FEATURE_NAMES
+    lofo = harness.leave_one_family_out(
+        lambda: DriftGuardClassifier(backend="random_forest", random_state=seed),
+        feature_names=FEATURE_NAMES,
+    )
+    for fam, d in lofo.items():
+        if not fam.startswith("_"):
+            console.print(f"  {fam:<28s} n={d['n']:<4d} detection={d['detection_rate']:.3f}")
+    console.print(f"  mean detection on unseen family: {lofo['_mean_detection_rate']:.3f}")
+    import json as _json
+    (out / "lofo.json").write_text(_json.dumps(lofo, indent=2))
     plot_confusion_matrix(
         held_result.metrics["confusion_matrix"],
         out / "held_out_confusion_matrix.png",

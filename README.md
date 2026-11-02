@@ -203,3 +203,21 @@ The human-review queue for quarantined (malicious) writes is selected via `QUARA
 ## License
 
 MIT — See [LICENSE](LICENSE). All attacks are reproduced for **defensive research only** in a controlled laboratory environment against the project's own agent.
+
+## Extended Metrics and the Hardened Benchmark
+
+`eval/extended_metrics.py` adds balanced accuracy, MCC, Cohen's kappa, attack recall/precision/F2,
+drift-preservation and drift-recognition rates, PR-AUC, Brier score, ECE, an asymmetric expected-cost
+score, bootstrap 95% CIs, per-family detection and the held-out generalisation gap. `run_eval.py`
+prints all of them plus leave-one-attack-family-out detection.
+
+The raw generators leave class fingerprints in timing, trust, text length and metadata, so the raw
+benchmark is separable at ~100% accuracy. `driftguard/benchmark/hardening.py` removes them:
+
+```bash
+python scripts/generate_benchmark.py --hard --out data/benchmark_hard.jsonl
+python scripts/generate_benchmark.py --harden-file data/held_out.jsonl --out data/held_out_hard.jsonl
+python scripts/train_detector.py --benchmark data/benchmark_hard.jsonl --model-out models/classifier_hard.pkl
+python scripts/run_eval.py --benchmark data/benchmark_hard.jsonl --model models/classifier_hard.pkl \
+    --held-out data/held_out_hard.jsonl --out results_hard
+```

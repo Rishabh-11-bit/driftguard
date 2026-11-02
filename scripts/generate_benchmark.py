@@ -24,7 +24,8 @@ from driftguard.benchmark.attack_generators.minja_style import generate_minja_en
 from driftguard.benchmark.attack_generators.agentpoison_style import generate_agentpoison_entries
 from driftguard.benchmark.benign_generators.preference_drift import generate_preference_drift_entries
 from driftguard.benchmark.benign_generators.ordinary_learning import generate_ordinary_learning_entries
-from driftguard.benchmark.labelling import save_benchmark, benchmark_stats
+from driftguard.benchmark.labelling import save_benchmark, benchmark_stats, load_benchmark
+from driftguard.benchmark.hardening import harden_entries
 
 console = Console()
 app = typer.Typer(help="Generate the DriftGuard three-class benchmark.")
@@ -38,11 +39,20 @@ def main(
     out:    Path = typer.Option(Path("data/benchmark.jsonl"), "--out", help="Output JSONL path."),
     seed:   int  = typer.Option(42, "--seed", help="Random seed."),
     minja_ratio: float = typer.Option(0.5, "--minja-ratio", help="Fraction of malicious from MINJA (rest AgentPoison)."),
+    hard: bool = typer.Option(False, "--hard", help="Apply artefact-removing hardening (see benchmark/hardening.py)."),
+    camouflage: float = typer.Option(0.7, "--camouflage", help="Hardening probability per transformation."),
+    harden_file: Path = typer.Option(None, "--harden-file", help="Instead of generating, harden an existing JSONL (e.g. data/held_out.jsonl) into --out."),
 ) -> None:
     """
     Generate the labelled three-class DriftGuard benchmark.
     """
     console.rule("[bold cyan]DriftGuard Benchmark Generator[/bold cyan]")
+
+    if harden_file is not None:
+        hardened = harden_entries(load_benchmark(harden_file), camouflage, seed)
+        save_benchmark(hardened, out)
+        console.print(f"[bold green]✓ Hardened {harden_file} -> {out}[/bold green]")
+        return
 
     n_minja  = int(n_malicious * minja_ratio)
     n_ap     = n_malicious - n_minja
@@ -67,6 +77,9 @@ def main(
     all_entries = minja_entries + ap_entries + drift_entries + ordinary_entries
     random.seed(seed)
     random.shuffle(all_entries)
+
+    if hard:
+        all_entries = harden_entries(all_entries, camouflage, seed)
 
     stats = benchmark_stats(all_entries)
 

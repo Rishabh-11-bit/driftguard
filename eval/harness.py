@@ -21,6 +21,7 @@ from driftguard.benchmark.labelling import load_benchmark, BenchmarkEntry
 from driftguard.detector.features import FeatureExtractor
 from driftguard.detector.classifier import DriftGuardClassifier
 from eval.metrics import compute_all_metrics, print_metrics_report
+from eval.extended_metrics import compute_extended_metrics, generalisation_gap
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,8 @@ class EvaluationHarness:
         elapsed = time.perf_counter() - t0
 
         metrics = compute_all_metrics(y_test, y_pred, y_proba)
+        metrics["extended"] = compute_extended_metrics(y_test, y_pred, y_proba, families_test)
+        metrics["extended"]["latency_ms_per_write"] = 1000 * elapsed / max(len(y_test), 1)
         return EvalResult(
             detector_name="DriftGuard",
             y_true=y_test,
@@ -159,6 +162,7 @@ class EvaluationHarness:
             y_proba = None
 
         metrics = compute_all_metrics(y_test, y_pred, y_proba)
+        metrics["extended"] = compute_extended_metrics(y_test, y_pred, y_proba, families_test)
         return EvalResult(
             detector_name=baseline_name,
             y_true=y_test,
@@ -217,6 +221,7 @@ class EvaluationHarness:
         elapsed = time.perf_counter() - t0
 
         metrics = compute_all_metrics(y, y_pred, y_proba)
+        metrics["extended"] = compute_extended_metrics(y, y_pred, y_proba, families)
         return EvalResult(
             detector_name="DriftGuard (held-out)",
             y_true=y,
@@ -226,6 +231,41 @@ class EvaluationHarness:
             metrics=metrics,
             eval_time_sec=elapsed,
         )
+
+    def leave_one_family_out(
+        self,
+        make_classifier,
+        feature_names: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Leave-one-attack-family-out: for each malicious family, train on every
+        other entry and test on that family alone. Estimates generalisation to
+        unseen attack types without needing a separate held-out file.
+        """
+        if self._X is None:
+            raise RuntimeError("Call load_and_extract() first.")
+        fam = np.asarray(self._families)
+        out: dict[str, Any] = {}
+        for f in sorted(set(fam[self._y == 0])):
+            test_mask = fam == f
+            clf = make_classifier()
+            clf.fit(self._X[~test_mask], self._y[~test_mask], feature_names=feature_names)
+            pred = clf.predict(self._X[test_mask])
+            out[f] = {
+                "n": int(test_mask.sum()),
+                "detection_rate": float(np.mean(pred == 0)),
+            }
+        out["_mean_detection_rate"] = float(
+            np.mean([v["detection_rate"] for k, v in out.items() if not k.startswith("_")])
+        )
+        return out
+
+    @staticmethod
+    def generalisation_gap(in_dist: EvalResult, held_out: EvalResult) -> dict[str, float]:
+        """In-distribution -> held-out drop (see extended_metrics.generalisation_gap)."""
+        a = {**in_dist.metrics, **in_dist.metrics["extended"]}
+        b = {**held_out.metrics, **held_out.metrics["extended"]}
+        return generalisation_gap(a, b)
 
     @staticmethod
     def save_results(result: EvalResult, output_dir: str | Path) -> None:
@@ -245,7 +285,8 @@ class EvaluationHarness:
             "roc_auc_macro":  result.metrics.get("roc_auc_macro"),
             "confusion_matrix": result.metrics["confusion_matrix"].tolist(),
             "classification_report": result.metrics["classification_report"],
+            "extended":       result.metrics.get("extended"),
         }
         with out_path.open("w") as f:
-            json.dump(serialisable, f, indent=2)
+            json.dump(serialisable, f, indent=2, default=float)
         logger.info(f"[Harness] Results saved to {out_path}.")
