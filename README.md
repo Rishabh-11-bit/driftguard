@@ -221,3 +221,15 @@ python scripts/train_detector.py --benchmark data/benchmark_hard.jsonl --model-o
 python scripts/run_eval.py --benchmark data/benchmark_hard.jsonl --model models/classifier_hard.pkl \
     --held-out data/held_out_hard.jsonl --out results_hard
 ```
+
+## Demo UI
+
+```bash
+pip install streamlit plotly
+streamlit run app/streamlit_app.py
+```
+
+Tabs: **Live Guard** (pick a scenario or type a memory write, see the verdict, probabilities,
+enforcement action, the memory store and a quarantine inbox with approve/reject), **Evaluation**
+(raw vs hardened benchmark metrics and plots), **Benchmark** (dataset explorer) and
+**How it works**. It needs `models/classifier_hard.pkl` (see the hardened benchmark commands above).

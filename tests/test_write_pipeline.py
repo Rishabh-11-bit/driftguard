@@ -108,3 +108,23 @@ def test_quarantine_queue_persistence(tmp_path):
     pending = queue2.list_pending()
     assert len(pending) == 1
     assert pending[0].candidate_text == "evil write"
+
+
+def test_classifier_receives_query_and_memory(tmp_path):
+    """Serving must supply the same context the detector was trained with."""
+    import numpy as np
+
+    backend = MockMemoryBackend()
+    backend.add("User likes tea.")
+    clf = MagicMock()
+    clf.predict_one.return_value = (2, np.array([0.1, 0.1, 0.8]))
+    queue = HumanReviewQueue(path=str(tmp_path / "q.jsonl"))
+    pipeline = WritePipeline(backend, clf, EnforcementPolicy(quarantine_queue=queue))
+    extractor = MagicMock()
+    extractor.extract.return_value = np.zeros(18)
+    pipeline._extractor = extractor
+
+    pipeline.process(make_candidate("User likes coffee."))
+    kwargs = extractor.extract.call_args.kwargs
+    assert kwargs["last_query"] == "user said something"
+    assert kwargs["user_memory_entries"] == ["User likes tea."]

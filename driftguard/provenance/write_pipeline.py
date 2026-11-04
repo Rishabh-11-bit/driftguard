@@ -105,6 +105,8 @@ class WritePipeline:
         self.enforcement = enforcement or EnforcementPolicy(HumanReviewQueue())
         self.history_window = history_window
         self._write_history: list[dict[str, Any]] = []
+        self._extractor: Any = None  # built once; loading the encoder is slow
+        self.last_features: Any = None  # feature vector of the most recent write
 
     # ── public API ───────────────────────────────────────────
 
@@ -161,6 +163,10 @@ class WritePipeline:
         )
         return result
 
+    def inject_history(self, records: list[dict[str, Any]]) -> None:
+        """Prepend synthetic prior writes (used by demos to simulate bursts)."""
+        self._write_history = (list(records) + self._write_history)[-self.history_window:]
+
     def get_write_history(self) -> list[dict[str, Any]]:
         """Return the recent write history buffer."""
         return list(self._write_history)
@@ -178,19 +184,32 @@ class WritePipeline:
             return 2, [0.05, 0.05, 0.90]
 
         try:
-            from driftguard.detector.features import FeatureExtractor
-            extractor = FeatureExtractor()
-            features = extractor.extract(
+            if self._extractor is None:
+                from driftguard.detector.features import FeatureExtractor
+                self._extractor = FeatureExtractor()
+            # The detector is trained with the triggering query and the user's
+            # existing memories; omitting them here zeroes three features.
+            features = self._extractor.extract(
                 content=candidate.content,
                 provenance=prov,
                 write_history=self._write_history,
                 session_id=candidate.session_id,
+                last_query=candidate.triggering_text,
+                user_memory_entries=self._existing_memory_texts(),
             )
+            self.last_features = features
             pred, proba = self.classifier.predict_one(features)
             return int(pred), proba.tolist()
         except Exception as exc:
             logger.error(f"[WritePipeline] Classifier error: {exc}. Defaulting to ordinary.")
             return 2, [0.0, 0.0, 1.0]
+
+    def _existing_memory_texts(self) -> list[str]:
+        """Texts currently in the memory store (empty if the backend can't list)."""
+        try:
+            return [e["text"] for e in self.memory_backend.list_all()]
+        except Exception:
+            return []
 
     def _commit(
         self,
