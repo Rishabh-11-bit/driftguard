@@ -201,7 +201,7 @@ def run_write(text: str, origin: str, query: str, burst: int) -> None:
     res = pipeline.process(CandidateWrite(
         content=text, origin=origin, session_id="demo-session", triggering_text=query,
     ))
-    st.session_state.naive.append(text)
+    st.session_state.setdefault("naive", list(SEED_MEMORIES)).append(text)
     st.session_state.last = {
         "text": text, "origin": origin, "query": query, "res": res,
         "features": None if pipeline.last_features is None else list(map(float, pipeline.last_features)),
@@ -325,12 +325,12 @@ with tab_live:
                 try:
                     st.session_state.llm_out = {
                         "q": question, "model": llm_model,
-                        "naive": local_llm.answer(llm_model, st.session_state.naive, question),
+                        "naive": local_llm.answer(llm_model, st.session_state.setdefault("naive", list(SEED_MEMORIES)), question),
                         "guard": local_llm.answer(llm_model, protected, question),
                     }
                 except Exception as exc:
                     st.session_state.llm_out = {"error": str(exc)}
-        out = st.session_state.llm_out
+        out = st.session_state.get("llm_out")
         if out and "error" in out:
             st.error(f"Ollama call failed: {out['error']}")
         elif out:
@@ -338,7 +338,7 @@ with tab_live:
             with a:
                 with st.container(border=True):
                     st.markdown("**⚠️ Unprotected agent**")
-                    st.caption(f"memory: {len(st.session_state.naive)} entries (all writes)")
+                    st.caption(f"memory: {len(st.session_state.get('naive', SEED_MEMORIES))} entries (all writes)")
                     st.write(out["naive"])
             with b:
                 with st.container(border=True):
