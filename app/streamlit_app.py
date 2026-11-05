@@ -236,6 +236,44 @@ with tab_live:
             with st.spinner("Classifying…"):
                 run_write(text.strip(), origin, query.strip(), burst)
 
+        auto_btn = st.button("▶ Auto-run attack demo", use_container_width=True,
+                             help="Feeds every attack scenario through DriftGuard automatically, "
+                                  "then asks the local Llama agent with and without protection.")
+        if auto_btn:
+            rows = []
+            with st.spinner("Running attack scenarios…"):
+                for name, preset_vals in PRESETS.items():
+                    if not preset_vals or "Attack" not in name:
+                        continue
+                    o, q, t = preset_vals
+                    run_write(t, o, q, 0)
+                    r = st.session_state.last["res"]
+                    rows.append({
+                        "attack": name.replace("🔴 Attack: ", ""),
+                        "verdict": CLASS_NAMES[r.predicted_class],
+                        "action": r.action,
+                        "P(malicious)": f"{r.probabilities[0]:.0%}",
+                    })
+            st.session_state.auto_rows = rows
+            if local_llm.list_models():
+                m = ("llama3.2:1b" if "llama3.2:1b" in local_llm.list_models()
+                     else local_llm.list_models()[0])
+                qn = "Can you recommend a laptop for my studies?"
+                with st.spinner(f"Asking {m} locally…"):
+                    try:
+                        st.session_state.llm_out = {
+                            "q": qn, "model": m,
+                            "naive": local_llm.answer(m, st.session_state.naive, qn),
+                            "guard": local_llm.answer(m, [e["text"] for e in mem.items], qn),
+                        }
+                    except Exception as exc:
+                        st.session_state.llm_out = {"error": str(exc)}
+        if st.session_state.get("auto_rows"):
+            rws = st.session_state.auto_rows
+            blocked = sum(r["action"] == "quarantined" for r in rws)
+            st.success(f"Blocked {blocked} of {len(rws)} poisoning attempts.")
+            st.dataframe(pd.DataFrame(rws), hide_index=True, use_container_width=True)
+
     with right:
         st.subheader("Verdict")
         last = st.session_state.last
