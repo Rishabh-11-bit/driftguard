@@ -233,3 +233,12 @@ Tabs: **Live Guard** (pick a scenario or type a memory write, see the verdict, p
 enforcement action, the memory store and a quarantine inbox with approve/reject), **Evaluation**
 (raw vs hardened benchmark metrics and plots), **Benchmark** (dataset explorer) and
 **How it works**. It needs `models/classifier_hard.pkl` (see the hardened benchmark commands above).
+
+### Local Llama agent (Ollama)
+
+The demo's **Live Guard** tab has an "Ask the local Llama agent" panel. With
+[Ollama](https://ollama.com) running and a model pulled (`ollama pull llama3.2:1b`),
+it asks the same local model the same question twice: once with a memory that stored
+every write (unprotected) and once with only what DriftGuard admitted. Submit an
+attack scenario first to see the poisoned recommendation appear only in the
+unprotected answer. No cloud API key is needed.

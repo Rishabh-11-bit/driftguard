@@ -33,6 +33,7 @@ from driftguard.provenance.enforcement import EnforcementPolicy, InMemoryReviewQ
 from driftguard.provenance.write_pipeline import CandidateWrite, WritePipeline
 from scripts.train_detector import FEATURE_NAMES
 from app.demo_data import PRESETS, SEED_MEMORIES, daily_history
+from app import local_llm
 
 st.set_page_config(page_title="DriftGuard", page_icon="🛡️", layout="wide")
 
@@ -113,6 +114,8 @@ def new_session(model_path: Path) -> None:
     )
     st.session_state.pipeline._extractor = load_extractor()
     st.session_state.pipeline.inject_history(daily_history())
+    st.session_state.naive = list(SEED_MEMORIES)  # unprotected agent: stores every write
+    st.session_state.llm_out = None
     st.session_state.log = []
     st.session_state.last = None
     st.session_state.model_path = str(model_path)
@@ -198,6 +201,7 @@ def run_write(text: str, origin: str, query: str, burst: int) -> None:
     res = pipeline.process(CandidateWrite(
         content=text, origin=origin, session_id="demo-session", triggering_text=query,
     ))
+    st.session_state.naive.append(text)
     st.session_state.last = {
         "text": text, "origin": origin, "query": query, "res": res,
         "features": None if pipeline.last_features is None else list(map(float, pipeline.last_features)),
@@ -300,6 +304,47 @@ with tab_live:
                 if r.button("Reject", key=f"rj{q.quarantine_id}"):
                     queue.mark_reviewed(q.quarantine_id, "reject")
                     st.rerun()
+
+    st.divider()
+    st.subheader("🦙 Ask the local Llama agent")
+    models = local_llm.list_models()
+    if not models:
+        st.info("Ollama is not running. Start it (`ollama serve`) and pull a model, "
+                "e.g. `ollama pull llama3.2:1b`, then reload.")
+    else:
+        st.caption("Same local model, same question — one agent remembers every write "
+                   "(unprotected), the other only what DriftGuard admitted.")
+        cm, cq = st.columns([2, 5])
+        llm_model = cm.selectbox("Local model", models,
+                                 index=models.index("llama3.2:1b") if "llama3.2:1b" in models else 0)
+        question = cq.text_input("Question for the agent",
+                                 value="Can you recommend a laptop for my studies?")
+        if st.button("Ask both agents", use_container_width=True):
+            protected = [e["text"] for e in mem.items]
+            with st.spinner(f"Running {llm_model} locally…"):
+                try:
+                    st.session_state.llm_out = {
+                        "q": question, "model": llm_model,
+                        "naive": local_llm.answer(llm_model, st.session_state.naive, question),
+                        "guard": local_llm.answer(llm_model, protected, question),
+                    }
+                except Exception as exc:
+                    st.session_state.llm_out = {"error": str(exc)}
+        out = st.session_state.llm_out
+        if out and "error" in out:
+            st.error(f"Ollama call failed: {out['error']}")
+        elif out:
+            a, b = st.columns(2, gap="large")
+            with a:
+                with st.container(border=True):
+                    st.markdown("**⚠️ Unprotected agent**")
+                    st.caption(f"memory: {len(st.session_state.naive)} entries (all writes)")
+                    st.write(out["naive"])
+            with b:
+                with st.container(border=True):
+                    st.markdown("**🛡️ DriftGuard-protected agent**")
+                    st.caption(f"memory: {len(mem)} entries (quarantined writes excluded)")
+                    st.write(out["guard"])
 
     if st.session_state.log:
         st.subheader("Session log")
