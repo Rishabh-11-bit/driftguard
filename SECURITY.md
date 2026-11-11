@@ -96,3 +96,10 @@ Leave-one-evasion-out (train without the technique, test on it): 0.97 – 1.00 f
 
 Open a private security advisory on the GitHub repository, or contact the maintainers (see README).
 Do not include real personal data in reports.
+
+## Addendum: findings from the research audit
+
+- **F-12 Wall-clock label leak (fixed).** `session_age_hours` used `now - record.timestamp`; because the benchmark is generated class by class it identified the class (AUROC 0.94 on random labels), and burst-window features were zero in training. All time features are now relative to the write's own timestamp; regression test in `tests/test_detector.py`. All models retrained.
+- **F-03 update: provenance laundering.** The original agent labelled every write `agent_reflection`, the highest default trust (0.9). `driftguard/provenance/attribution.py` now attributes a write to the least-trusted source it is grounded in (token containment >= 0.5). This is heuristic: paraphrased injected content can still be attributed to the user.
+- **Adaptive attackers.** Scripted evasions: combined evasion drops the standard model to 0.23 detection; the adversarially trained model holds 1.00 in-distribution and 0.90-1.00 leave-one-evasion-out. Query-budgeted LLM attacker (60 attacks, 10 queries): ASR@10 is 0.08 (robust) to 0.15 (v2) with runtime attribution, 0.80 for the raw model. Detection is not a guarantee; add rate limiting on repeated quarantined writes.
+- **F-11 Dependencies.** `pip-audit` flagged fastapi 0.109/starlette 0.35 (upgraded, pinned in the `service` extra). Remaining advisories are in the wider environment (torch, transformers, langchain, etc.) and should be re-audited in CI.

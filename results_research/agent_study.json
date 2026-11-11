@@ -1,0 +1,103 @@
+{
+  "No defence": {
+    "block_attack": 0.0,
+    "asr": 0.4666666666666667,
+    "exposure": 1.0,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "Rule-based": {
+    "block_attack": 0.8,
+    "asr": 0.2,
+    "exposure": 0.2,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "LLM judge (local)": {
+    "block_attack": 0.4666666666666667,
+    "asr": 0.26666666666666666,
+    "exposure": 0.5333333333333333,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-hard, legacy origin": {
+    "block_attack": 0.5666666666666667,
+    "asr": 0.36666666666666664,
+    "exposure": 0.43333333333333335,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-hard, runtime attribution": {
+    "block_attack": 0.5666666666666667,
+    "asr": 0.36666666666666664,
+    "exposure": 0.43333333333333335,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 0.9,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-robust, runtime attribution": {
+    "block_attack": 0.7,
+    "asr": 0.3,
+    "exposure": 0.3,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 0.9,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-robust, oracle origin": {
+    "block_attack": 0.6,
+    "asr": 0.36666666666666664,
+    "exposure": 0.4,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 0.8666666666666667,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-v2, runtime attribution": {
+    "block_attack": 0.7,
+    "asr": 0.26666666666666666,
+    "exposure": 0.3,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "DriftGuard-v2, oracle origin": {
+    "block_attack": 0.7,
+    "asr": 0.26666666666666666,
+    "exposure": 0.3,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 1.0,
+    "drift_util_withhold": 1.0,
+    "ordinary_util": 1.0
+  },
+  "_runtime_attribution_accuracy": {
+    "attack_attributed_untrusted": 0.9333333333333333,
+    "benign_attributed_user": 0.7833333333333333
+  },
+  "_setup": {
+    "agent_model": "llama3.2:1b",
+    "judge_model": "llama3:latest",
+    "n_attack": 30,
+    "n_drift": 30,
+    "n_ordinary": 30
+  }
+}
