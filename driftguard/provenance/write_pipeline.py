@@ -205,8 +205,10 @@ class WritePipeline:
 
         try:
             if self._extractor is None:
-                from driftguard.detector.features import FeatureExtractor
-                self._extractor = FeatureExtractor()
+                from driftguard.detector.features import FeatureExtractor, SemanticFeatureExtractor
+                # v2 models carry the 7 semantic-anchor features; pick the extractor that matches
+                n_feat = len(getattr(self.classifier, "_feature_names", None) or [])
+                self._extractor = SemanticFeatureExtractor() if n_feat > 18 else FeatureExtractor()
             # The detector is trained with the triggering query and the user's
             # existing memories; omitting them here zeroes three features.
             features = self._extractor.extract(

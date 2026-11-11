@@ -242,3 +242,13 @@ it asks the same local model the same question twice: once with a memory that st
 every write (unprotected) and once with only what DriftGuard admitted. Submit an
 attack scenario first to see the poisoned recommendation appear only in the
 unprotected answer. No cloud API key is needed.
+
+## Security, evaluation and productisation
+
+* [`SECURITY.md`](SECURITY.md) — threat model, entry-point table, audit findings (fixed / open) and measured adaptive-attacker results.
+* `python -m scripts.run_adversarial` — evasion evaluation; `scripts.train_robust` — adversarial training; `scripts.run_transform_holdout` — leave-one-evasion-out.
+* `python -m scripts.run_research_eval` — repeated cross-validation with 95 % CIs, baselines, feature-family ablation, McNemar test.
+* `python -m scripts.run_independent_eval` — scores trained detectors on free-form text written by a local LLM.
+* **Models are signed.** `DriftGuardClassifier.load` refuses unsigned or modified pickles. After training, a `.sig` file is written automatically; for models from elsewhere, review then `python -m scripts.sign_model <file>`. Set `DRIFTGUARD_MODEL_KEY` to use an HMAC.
+* **Guard API** (`service/api.py`): `DRIFTGUARD_API_KEYS="<key-16+chars>:<tenant>" uvicorn service.api:app --host 127.0.0.1` — API-key auth, per-tenant isolation, rate and size limits. Container: see `Dockerfile`.
+* [`docs/PRODUCT-BRIEF.md`](docs/PRODUCT-BRIEF.md) — path from research prototype to a product, and what evidence is still missing.

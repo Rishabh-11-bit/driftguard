@@ -31,6 +31,7 @@ import streamlit as st
 from driftguard.detector.classifier import DriftGuardClassifier
 from driftguard.provenance.enforcement import EnforcementPolicy, InMemoryReviewQueue
 from driftguard.provenance.write_pipeline import CandidateWrite, WritePipeline
+from driftguard.detector.features import SEMANTIC_FEATURE_NAMES
 from scripts.train_detector import FEATURE_NAMES
 from app.demo_data import PRESETS, SEED_MEMORIES, daily_history
 from app import local_llm
@@ -40,7 +41,8 @@ st.set_page_config(page_title="DriftGuard", page_icon="🛡️", layout="wide")
 CLASS_NAMES = ["Malicious", "Benign drift", "Ordinary learning"]
 CLASS_COLORS = ["#ef4444", "#f59e0b", "#22c55e"]
 MODELS = {
-    "Hardened model (recommended)": ROOT / "models" / "classifier_hard.pkl",
+    "v2: semantic + robust + real text (recommended)": ROOT / "models" / "classifier_v2.pkl",
+    "Hardened model": ROOT / "models" / "classifier_hard.pkl",
     "Raw-benchmark model": ROOT / "models" / "classifier.pkl",
 }
 st.markdown(
@@ -93,11 +95,11 @@ def load_model(path: str) -> DriftGuardClassifier:
 
 
 @st.cache_resource(show_spinner="Warming up the embedding model (first run only)…")
-def load_extractor():
-    """One shared FeatureExtractor with the encoder already loaded."""
-    from driftguard.detector.features import FeatureExtractor
+def load_extractor(semantic: bool = False):
+    """One shared extractor (matching the model's feature set) with the encoder already loaded."""
+    from driftguard.detector.features import FeatureExtractor, SemanticFeatureExtractor
 
-    ex = FeatureExtractor()
+    ex = SemanticFeatureExtractor() if semantic else FeatureExtractor()
     ex.encoder.encode(["warm-up"])
     return ex
 
@@ -109,10 +111,9 @@ def new_session(model_path: Path) -> None:
     queue = InMemoryReviewQueue()
     st.session_state.mem = mem
     st.session_state.queue = queue
-    st.session_state.pipeline = WritePipeline(
-        mem, load_model(str(model_path)), EnforcementPolicy(quarantine_queue=queue)
-    )
-    st.session_state.pipeline._extractor = load_extractor()
+    model = load_model(str(model_path))
+    st.session_state.pipeline = WritePipeline(mem, model, EnforcementPolicy(quarantine_queue=queue))
+    st.session_state.pipeline._extractor = load_extractor(len(model._feature_names or []) > 18)
     st.session_state.pipeline.inject_history(daily_history())
     st.session_state.naive = list(SEED_MEMORIES)  # unprotected agent: stores every write
     st.session_state.llm_out = None
@@ -307,7 +308,8 @@ with tab_live:
 
             if last["features"]:
                 with st.expander("Signals the detector saw (18 features)"):
-                    fdf = pd.DataFrame({"feature": FEATURE_NAMES, "value": last["features"]})
+                    names = (FEATURE_NAMES + SEMANTIC_FEATURE_NAMES)[:len(last["features"])]
+                    fdf = pd.DataFrame({"feature": names, "value": last["features"]})
                     st.dataframe(fdf, hide_index=True, use_container_width=True, height=300)
 
     st.divider()

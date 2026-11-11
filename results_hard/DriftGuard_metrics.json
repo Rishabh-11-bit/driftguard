@@ -1,11 +1,11 @@
 {
   "detector_name": "DriftGuard",
-  "eval_time_sec": 0.2528421000461094,
+  "eval_time_sec": 0.28296880004927516,
   "FAR": 0.075,
   "MAR": 0.0,
   "accuracy": 0.9,
-  "f1_macro": 0.8989907682678767,
-  "roc_auc_macro": 0.9751041666666667,
+  "f1_macro": 0.8991713194240375,
+  "roc_auc_macro": 0.9667708333333334,
   "confusion_matrix": [
     [
       40,
@@ -14,13 +14,13 @@
     ],
     [
       3,
-      34,
-      3
+      35,
+      2
     ],
     [
       0,
-      6,
-      34
+      7,
+      33
     ]
   ],
   "classification_report": {
@@ -31,34 +31,34 @@
       "support": 40.0
     },
     "benign_drift": {
-      "precision": 0.85,
-      "recall": 0.85,
-      "f1-score": 0.85,
+      "precision": 0.8333333333333334,
+      "recall": 0.875,
+      "f1-score": 0.8536585365853658,
       "support": 40.0
     },
     "ordinary_learning": {
-      "precision": 0.918918918918919,
-      "recall": 0.85,
-      "f1-score": 0.8831168831168831,
+      "precision": 0.9428571428571428,
+      "recall": 0.825,
+      "f1-score": 0.88,
       "support": 40.0
     },
     "accuracy": 0.9,
     "macro avg": {
-      "precision": 0.8997171590194846,
+      "precision": 0.9021410114433369,
       "recall": 0.9,
-      "f1-score": 0.8989907682678767,
+      "f1-score": 0.8991713194240375,
       "support": 120.0
     },
     "weighted avg": {
-      "precision": 0.8997171590194847,
+      "precision": 0.902141011443337,
       "recall": 0.9,
-      "f1-score": 0.8989907682678767,
+      "f1-score": 0.8991713194240377,
       "support": 120.0
     }
   },
   "extended": {
     "balanced_accuracy": 0.9,
-    "mcc": 0.8507979973592922,
+    "mcc": 0.85168730250158,
     "cohen_kappa": 0.85,
     "attack_tpr": 1.0,
     "attack_fpr": 0.0375,
@@ -67,12 +67,12 @@
     "attack_f2": 0.9852216748768474,
     "attack_containment_rate": 1.0,
     "drift_preservation_rate": 0.925,
-    "drift_recognition_rate": 0.85,
+    "drift_recognition_rate": 0.875,
     "ordinary_passthrough_rate": 1.0,
     "legit_quarantine_rate": 0.0375,
-    "expected_cost": 0.0975,
+    "expected_cost": 0.095,
     "admit_all_cost": 3.5,
-    "cost_reduction": 0.9721428571428572,
+    "cost_reduction": 0.9728571428571429,
     "confidence_intervals": {
       "accuracy": [
         0.8416666666666667,
@@ -87,8 +87,8 @@
         0.0
       ]
     },
-    "brier_score": 0.15809417807063444,
-    "ece": 0.03519540076619181,
+    "brier_score": 0.16065546765687397,
+    "ece": 0.032596211897610784,
     "malicious_pr_auc": 0.9937421708586663,
     "per_family": {
       "agentpoison": {
@@ -104,6 +104,6 @@
         "to_ordinary": 0.0
       }
     },
-    "latency_ms_per_write": 2.107017500384245
+    "latency_ms_per_write": 2.3580733337439597
   }
 }

@@ -1,0 +1,43 @@
+{
+  "n_attack": 400,
+  "n_benign": 400,
+  "zero_shot": {
+    "rule-based": {
+      "attack_tpr": 0.92,
+      "false_alarm": 0.5075,
+      "auroc": 0.70625,
+      "n_scored": 800
+    },
+    "classifier": {
+      "attack_tpr": 0.54,
+      "false_alarm": 0.2375,
+      "auroc": 0.7286343750000001,
+      "n_scored": 800
+    },
+    "classifier_hard": {
+      "attack_tpr": 0.7725,
+      "false_alarm": 0.095,
+      "auroc": 0.89499375,
+      "n_scored": 800
+    },
+    "classifier_robust": {
+      "attack_tpr": 0.8225,
+      "false_alarm": 0.115,
+      "auroc": 0.9250687499999999,
+      "n_scored": 800
+    },
+    "classifier_v2": {
+      "attack_tpr": 0.9320388349514563,
+      "false_alarm": 0.055401662049861494,
+      "auroc": 0.9889465616007315,
+      "n_scored": 567
+    }
+  },
+  "cv": {
+    "random_forest on real text": {
+      "attack_tpr": 0.9549999999999998,
+      "false_alarm": 0.06749999999999999,
+      "auroc": 0.9871875000000001
+    }
+  }
+}

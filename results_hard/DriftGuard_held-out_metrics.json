@@ -1,16 +1,16 @@
 {
   "detector_name": "DriftGuard (held-out)",
-  "eval_time_sec": 0.25554829998873174,
+  "eval_time_sec": 0.23373549990355968,
   "FAR": 0.0,
-  "MAR": 0.0,
-  "accuracy": 1.0,
-  "f1_macro": 0.3333333333333333,
+  "MAR": 0.005,
+  "accuracy": 0.995,
+  "f1_macro": 0.33249791144527985,
   "roc_auc_macro": NaN,
   "confusion_matrix": [
     [
-      200,
+      199,
       0,
-      0
+      1
     ],
     [
       0,
@@ -26,8 +26,8 @@
   "classification_report": {
     "malicious": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "recall": 0.995,
+      "f1-score": 0.9974937343358395,
       "support": 200.0
     },
     "benign_drift": {
@@ -42,40 +42,40 @@
       "f1-score": 0.0,
       "support": 0.0
     },
-    "accuracy": 1.0,
+    "accuracy": 0.995,
     "macro avg": {
       "precision": 0.3333333333333333,
-      "recall": 0.3333333333333333,
-      "f1-score": 0.3333333333333333,
+      "recall": 0.33166666666666667,
+      "f1-score": 0.33249791144527985,
       "support": 200.0
     },
     "weighted avg": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "recall": 0.995,
+      "f1-score": 0.9974937343358395,
       "support": 200.0
     }
   },
   "extended": {
-    "balanced_accuracy": 1.0,
+    "balanced_accuracy": 0.995,
     "mcc": 0.0,
-    "cohen_kappa": NaN,
-    "attack_tpr": 1.0,
+    "cohen_kappa": 0.0,
+    "attack_tpr": 0.995,
     "attack_fpr": 0.0,
     "attack_tnr": 0.0,
     "attack_precision": 1.0,
-    "attack_f2": 1.0,
-    "attack_containment_rate": 1.0,
+    "attack_f2": 0.9959959959959959,
+    "attack_containment_rate": 0.995,
     "drift_preservation_rate": null,
     "drift_recognition_rate": null,
     "ordinary_passthrough_rate": null,
     "legit_quarantine_rate": null,
-    "expected_cost": 0.0,
+    "expected_cost": 0.05,
     "admit_all_cost": 10.0,
-    "cost_reduction": 1.0,
+    "cost_reduction": 0.995,
     "confidence_intervals": {
       "accuracy": [
-        1.0,
+        0.985,
         1.0
       ],
       "FAR": [
@@ -84,11 +84,11 @@
       ],
       "MAR": [
         0.0,
-        0.0
+        0.015
       ]
     },
-    "brier_score": 0.007544798078971863,
-    "ece": 0.038298158383925945,
+    "brier_score": 0.01860925851865261,
+    "ece": 0.06230562770211656,
     "malicious_pr_auc": 1.0,
     "per_family": {
       "indirect_tool_injection": {
@@ -99,9 +99,9 @@
       },
       "slow_drip": {
         "n": 100,
-        "detection_rate": 1.0,
+        "detection_rate": 0.99,
         "to_benign_drift": 0.0,
-        "to_ordinary": 0.0
+        "to_ordinary": 0.01
       }
     }
   }

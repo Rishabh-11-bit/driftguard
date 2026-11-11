@@ -1,6 +1,6 @@
 {
   "detector_name": "Rule-Based",
-  "eval_time_sec": 3.659998765215278e-05,
+  "eval_time_sec": 4.12999652326107e-05,
   "FAR": 0.375,
   "MAR": 0.0,
   "accuracy": 0.5583333333333333,

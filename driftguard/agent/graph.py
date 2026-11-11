@@ -28,6 +28,7 @@ from driftguard.agent.memory_backend import MemoryBackend, get_memory_backend
 from driftguard.agent.llm_interface import get_llm
 from driftguard.provenance.write_pipeline import WritePipeline, CandidateWrite
 from driftguard.provenance.enforcement import EnforcementPolicy, HumanReviewQueue
+from driftguard.provenance.attribution import Source, attribute_origin
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,9 @@ class AgentState(TypedDict):
     candidate_writes: list[str]
     write_results: list[dict[str, Any]]
     final_response: str
+    # External content that entered the context this turn, tagged by the runtime:
+    # [{"origin": "tool_output" | "retrieved_doc", "text": "..."}]
+    observations: list[dict[str, Any]]
 
 
 # ─────────────────────────────────────────────────────────────
@@ -92,6 +96,10 @@ def _make_llm_node(llm: Any):
 
         system_msg = SystemMessage(content=SYSTEM_PROMPT.format(memories=memory_text))
         messages = [system_msg] + state["messages"]
+        obs = state.get("observations") or []
+        if obs:
+            external = "\n".join(f"[{o['origin']}] {o['text']}" for o in obs)
+            messages.append(SystemMessage(content=f"External content retrieved for this turn:\n{external}"))
 
         response = llm.invoke(messages)
         response_text = response.content if hasattr(response, "content") else str(response)
@@ -118,10 +126,16 @@ def _make_pipeline_node(pipeline: WritePipeline):
                 last_user_msg = msg.content
                 break
 
+        # Runtime-computed taint: the origin comes from where the content was seen,
+        # never from the model or the text itself.
+        sources = [Source("user_turn", m.content) for m in state["messages"]
+                   if isinstance(m, HumanMessage)]
+        sources += [Source(o["origin"], o["text"]) for o in state.get("observations") or []]
+
         for text in state.get("candidate_writes", []):
             candidate = CandidateWrite(
                 content=text,
-                origin="agent_reflection",
+                origin=attribute_origin(text, sources).origin,
                 session_id=state["session_id"],
                 triggering_text=last_user_msg,
             )
@@ -200,6 +214,7 @@ def run_agent(
     session_id: str,
     compiled_graph,
     message_history: list[BaseMessage] | None = None,
+    observations: list[dict[str, Any]] | None = None,
 ) -> tuple[str, list[dict[str, Any]]]:
     """
     Run a single turn of the DriftGuard agent.
@@ -218,6 +233,7 @@ def run_agent(
         candidate_writes=[],
         write_results=[],
         final_response="",
+        observations=list(observations or []),
     )
 
     final_state = compiled_graph.invoke(state)

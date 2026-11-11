@@ -1,9 +1,9 @@
 {
-  "benign padding": 0.975,
+  "benign padding": 0.9,
   "synonym swap": 1.0,
   "origin laundering": 1.0,
   "history camouflage": 1.0,
-  "COMBINED attacker": 0.975,
+  "COMBINED attacker": 0.875,
   "zero-width": 1.0,
-  "homoglyph": 1.0
+  "homoglyph": 0.975
 }
