@@ -332,7 +332,7 @@ with tab_live:
             st.caption("Nothing waiting for review.")
         for q in pending:
             with st.container(border=True):
-                st.write(q.candidate_text)
+                st.text(q.candidate_text)  # plain text: untrusted, never markdown
                 st.caption(f"P(malicious) = {q.probabilities[0]:.0%}")
                 a, r = st.columns(2)
                 if a.button("Approve (false alarm)", key=f"ap{q.quarantine_id}"):
@@ -377,12 +377,12 @@ with tab_live:
                 with st.container(border=True):
                     st.markdown("**⚠️ Unprotected agent**")
                     st.caption(f"memory: {len(st.session_state.get('naive', SEED_MEMORIES))} entries (all writes)")
-                    st.write(out["naive"])
+                    st.text(out["naive"])  # plain text: model output may be attacker-influenced
             with b:
                 with st.container(border=True):
                     st.markdown("**🛡️ DriftGuard-protected agent**")
                     st.caption(f"memory: {len(mem)} entries (quarantined writes excluded)")
-                    st.write(out["guard"])
+                    st.text(out["guard"])
 
     if st.session_state.log:
         st.subheader("Session log")

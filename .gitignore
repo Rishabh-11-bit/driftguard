@@ -20,3 +20,4 @@ results/*.png
 
 # Scratch working directory for presentation building (not project source)
 pptx_work/
+models/*.sig

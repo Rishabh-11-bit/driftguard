@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from .enforcement import EnforcementPolicy, HumanReviewQueue, WriteResult
+from driftguard.security import MAX_QUERY_CHARS, MAX_WRITE_CHARS, normalise_text
 from .schema import ProvenanceRecord, make_provenance, Origin
 
 if TYPE_CHECKING:
@@ -99,7 +100,14 @@ class WritePipeline:
         classifier: "DriftGuardClassifier | None" = None,
         enforcement: EnforcementPolicy | None = None,
         history_window: int = 50,
+        allow_trust_override: bool = False,
+        fail_closed: bool = True,
     ) -> None:
+        # allow_trust_override: honour CandidateWrite.trust_override. Off by default -
+        #   trust must come from the runtime's origin table, never from content-derived input.
+        # fail_closed: if the detector raises, quarantine instead of admitting.
+        self.allow_trust_override = allow_trust_override
+        self.fail_closed = fail_closed
         self.memory_backend = memory_backend
         self.classifier = classifier
         self.enforcement = enforcement or EnforcementPolicy(HumanReviewQueue())
@@ -126,12 +134,24 @@ class WritePipeline:
         """
         t0 = time.perf_counter()
 
+        # Step 0 — Sanitise untrusted text (invisible chars, NFKC, length cap)
+        candidate = CandidateWrite(
+            content=normalise_text(candidate.content, MAX_WRITE_CHARS),
+            origin=candidate.origin,
+            session_id=candidate.session_id,
+            triggering_text=normalise_text(candidate.triggering_text or "", MAX_QUERY_CHARS),
+            trust_override=candidate.trust_override,
+            metadata=candidate.metadata,
+        )
+
         # Step 1 — Provenance tagging
+        if candidate.trust_override is not None and not self.allow_trust_override:
+            logger.warning("[WritePipeline] trust_override ignored (allow_trust_override=False).")
         prov = make_provenance(
             origin=candidate.origin,
             session_id=candidate.session_id,
             triggering_text=candidate.triggering_text,
-            trust_override=candidate.trust_override,
+            trust_override=candidate.trust_override if self.allow_trust_override else None,
             metadata=candidate.metadata or {},
         )
 
@@ -201,6 +221,9 @@ class WritePipeline:
             pred, proba = self.classifier.predict_one(features)
             return int(pred), proba.tolist()
         except Exception as exc:
+            if self.fail_closed:
+                logger.error(f"[WritePipeline] Classifier error: {exc}. Failing closed (quarantine).")
+                return 0, [1.0, 0.0, 0.0]
             logger.error(f"[WritePipeline] Classifier error: {exc}. Defaulting to ordinary.")
             return 2, [0.0, 0.0, 1.0]
 
@@ -218,13 +241,15 @@ class WritePipeline:
         result: WriteResult,
     ) -> None:
         """Commit an approved write to the vector store with provenance metadata."""
+        # Caller metadata goes first so it can never overwrite the verdict fields below
+        # (e.g. an attacker-supplied {"flagged": False} must not hide a flagged write).
         meta = {
+            **(candidate.metadata or {}),
             "provenance": prov.to_dict(),
             "driftguard_class": result.class_name,
             "driftguard_action": result.action,
             "flagged": result.action == "admitted_flagged",
             "flag_reason": result.flag_reason,
-            **(candidate.metadata or {}),
         }
         self.memory_backend.add(candidate.content, meta)
         logger.debug(f"[WritePipeline] Committed to memory store.")

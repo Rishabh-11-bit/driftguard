@@ -1,0 +1,470 @@
+[
+  {
+    "set": "in-distribution attacks",
+    "transform": "none (clean)",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "zero-width chars",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 0.925,
+      "ci95": [
+        0.85,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "full-width forms",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "cross-script homoglyphs",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 0.975,
+      "ci95": [
+        0.925,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 0.95,
+      "ci95": [
+        0.875,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 0.975,
+      "ci95": [
+        0.925,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "benign padding",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 0.825,
+      "ci95": [
+        0.7,
+        0.925
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 0.8,
+      "ci95": [
+        0.675,
+        0.9131249999999995
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 0.7,
+      "ci95": [
+        0.55,
+        0.8381249999999993
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "synonym swap",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 0.975,
+      "ci95": [
+        0.925,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 0.975,
+      "ci95": [
+        0.925,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 0.95,
+      "ci95": [
+        0.875,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "origin laundering (claims user_turn)",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "history camouflage",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "in-distribution attacks",
+    "transform": "COMBINED adaptive attacker",
+    "n": 40,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 0.325,
+      "ci95": [
+        0.175,
+        0.475
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 0.325,
+      "ci95": [
+        0.175,
+        0.475
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 0.2,
+      "ci95": [
+        0.075,
+        0.325
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "none (clean)",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "zero-width chars",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "full-width forms",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "cross-script homoglyphs",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "benign padding",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "synonym swap",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "origin laundering (claims user_turn)",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "history camouflage",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "set": "held-out attack families",
+    "transform": "COMBINED adaptive attacker",
+    "n": 200,
+    "DriftGuard (no sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "DriftGuard (+sanitiser)": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "Rule-based": {
+      "attack_tpr": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    }
+  }
+]

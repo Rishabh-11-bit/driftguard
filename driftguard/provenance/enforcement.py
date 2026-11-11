@@ -130,6 +130,10 @@ class HumanReviewQueue(BaseReviewQueue):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
             self.path.touch()
+        try:  # quarantined text may contain personal data: owner-only access (best effort on Windows)
+            os.chmod(self.path, 0o600)
+        except OSError:
+            pass
 
     def enqueue(self, entry: QuarantineEntry) -> None:
         """Append an entry to the queue."""
@@ -234,6 +238,11 @@ class RedisReviewQueue(BaseReviewQueue):
             ) from exc
 
         url = url or os.getenv("REDIS_URL", "redis://localhost:6379")
+        if url.startswith("redis://") and not any(h in url for h in ("localhost", "127.0.0.1", "[::1]")):
+            logger.warning(
+                "[Quarantine] REDIS_URL is a remote host without TLS (redis://). "
+                "Use rediss:// and a password; quarantined text may contain personal data."
+            )
         self._client = redis.Redis.from_url(url, decode_responses=True)
         self._hash_key = hash_key
 

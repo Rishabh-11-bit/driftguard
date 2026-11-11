@@ -243,11 +243,17 @@ class DriftGuardClassifier:
                 "feature_names": self._feature_names,
                 "is_fitted":     self._is_fitted,
             }, f)
+        from driftguard.security import sign_file
+        sign_file(path)
         logger.info(f"[Classifier] Saved to {path}.")
 
     @classmethod
-    def load(cls, path: str | Path) -> "DriftGuardClassifier":
+    def load(cls, path: str | Path, allow_unsigned: bool = False) -> "DriftGuardClassifier":
+        """Load a model. Pickle can execute code, so the file's signature is verified first."""
         path = Path(path)
+        if not allow_unsigned:
+            from driftguard.security import verify_file
+            verify_file(path)
         with path.open("rb") as f:
             state = pickle.load(f)
         obj = cls(
