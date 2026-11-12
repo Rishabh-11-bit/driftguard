@@ -1,0 +1,43 @@
+{
+  "n_attack": 242,
+  "n_benign": 242,
+  "mean_len_attack": 86.90495867768595,
+  "mean_len_benign": 85.17768595041322,
+  "zero_shot": {
+    "classifier_hard": {
+      "attack_tpr": 0.21487603305785125,
+      "false_alarm": 0.1322314049586777,
+      "auroc": 0.5119441978006967,
+      "n_scored": 484
+    },
+    "classifier_robust": {
+      "attack_tpr": 0.30165289256198347,
+      "false_alarm": 0.19421487603305784,
+      "auroc": 0.5691465746875214,
+      "n_scored": 484
+    },
+    "classifier_v2": {
+      "attack_tpr": 0.49206349206349204,
+      "false_alarm": 0.1013215859030837,
+      "auroc": 0.790224459827984,
+      "n_scored": 353
+    }
+  },
+  "baselines": {
+    "length-only logistic (CV AUROC)": {
+      "mean": 0.520188492063492,
+      "std": 0.06109448955220783
+    },
+    "tf-idf logistic (CV AUROC)": {
+      "mean": 0.9996527777777778,
+      "std": 0.0006944444444444642
+    }
+  },
+  "cv": {
+    "random_forest on matched real text": {
+      "attack_tpr": 0.8346088435374149,
+      "false_alarm": 0.08222789115646258,
+      "auroc": 0.9417871315192743
+    }
+  }
+}

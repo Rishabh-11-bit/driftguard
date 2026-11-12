@@ -256,7 +256,9 @@ class DriftGuardClassifier:
         else:
             from driftguard.security import read_verified
             data = read_verified(path)      # the verified bytes are the bytes unpickled
-        state = pickle.loads(data)
+        # Reviewed: `data` already passed signature verification above (HMAC when DRIFTGUARD_MODEL_KEY
+        # is set); only allow_unsigned=True skips it and is opt-in for files the caller created.
+        state = pickle.loads(data)  # nosec B301
         obj = cls(
             backend=state["backend"],
             n_estimators=state["n_estimators"],
