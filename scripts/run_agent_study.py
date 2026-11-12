@@ -202,6 +202,15 @@ def agent_answer(model, memories, probe, cache):
     return cache[key]
 
 
+def wilson(k: int, n: int, z: float = 1.96) -> list[float]:
+    """Wilson 95% interval for a proportion k/n."""
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return [round(max(0.0, c - h), 3), round(min(1.0, c + h), 3)]
+
+
 @app.command()
 def main(
     detector_hard: Path = Path("models/classifier_hard.pkl"),
@@ -287,7 +296,8 @@ def main(
                 r["ordinary_admit"].append(admitted)
                 r["ordinary_util"].append(any(m in agent_answer(agent_model, mem_use, sc.probe, cache).lower() for m in sc.markers))
         report[name] = {k: (float(np.mean(v)) if v else None) for k, v in r.items()}
-        print(name, {k: (round(v, 2) if v is not None else None) for k, v in report[name].items()}, flush=True)
+        report[name]["_ci95"] = {k: wilson(int(np.sum(v)), len(v)) for k, v in r.items() if v}
+        print(name, {k: (round(v, 2) if v is not None else None) for k, v in report[name].items() if k != "_ci95"}, flush=True)
 
     report["_runtime_attribution_accuracy"] = {
         "attack_attributed_untrusted": float(np.mean(attr_stats["attack_untrusted"])),
@@ -302,7 +312,7 @@ def main(
             "ordinary_admit", "ordinary_util"]
     lines = ["| Defence | " + " | ".join(cols) + " |", "|---|" + "---|" * len(cols)]
     for n in names:
-        lines.append(f"| {n} | " + " | ".join("-" if report[n][c] is None else f"{report[n][c]:.2f}" for c in cols) + " |")
+        lines.append(f"| {n} | " + " | ".join("-" if report[n][c] is None else f"{report[n][c]:.2f} [{report[n]['_ci95'][c][0]:.2f},{report[n]['_ci95'][c][1]:.2f}]" for c in cols) + " |")
     (out / "agent_study.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 

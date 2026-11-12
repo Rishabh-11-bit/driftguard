@@ -251,11 +251,12 @@ class DriftGuardClassifier:
     def load(cls, path: str | Path, allow_unsigned: bool = False) -> "DriftGuardClassifier":
         """Load a model. Pickle can execute code, so the file's signature is verified first."""
         path = Path(path)
-        if not allow_unsigned:
-            from driftguard.security import verify_file
-            verify_file(path)
-        with path.open("rb") as f:
-            state = pickle.load(f)
+        if allow_unsigned:
+            data = path.read_bytes()
+        else:
+            from driftguard.security import read_verified
+            data = read_verified(path)      # the verified bytes are the bytes unpickled
+        state = pickle.loads(data)
         obj = cls(
             backend=state["backend"],
             n_estimators=state["n_estimators"],

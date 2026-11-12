@@ -61,8 +61,9 @@ def _sig_path(path: Path) -> Path:
     return path.with_name(path.name + ".sig")
 
 
-def _digest(path: Path, key: bytes | None) -> tuple[str, str]:
-    data = path.read_bytes()
+def _digest(path: Path, key: bytes | None, data: bytes | None = None) -> tuple[str, str]:
+    if data is None:
+        data = path.read_bytes()
     if key:
         return "hmac-sha256", hmac.new(key, data, hashlib.sha256).hexdigest()
     return "sha256", hashlib.sha256(data).hexdigest()
@@ -82,7 +83,7 @@ def sign_file(path: str | Path) -> Path:
     return sig
 
 
-def verify_file(path: str | Path) -> None:
+def verify_file(path: str | Path, data: bytes | None = None) -> None:
     """Raise ModelIntegrityError unless `<path>.sig` exists and matches the file.
 
     With DRIFTGUARD_MODEL_KEY set, only an HMAC signature is accepted, so an
@@ -98,10 +99,25 @@ def verify_file(path: str | Path) -> None:
             f"on load; only load files you created. Re-sign trusted files with "
             f"`python -m scripts.sign_model {path}`."
         )
-    meta = json.loads(sig.read_text(encoding="utf-8"))
+    try:
+        meta = json.loads(sig.read_text(encoding="utf-8"))
+        if not isinstance(meta, dict):
+            raise ValueError("signature is not an object")
+    except (OSError, ValueError) as exc:
+        raise ModelIntegrityError(f"{path}: unreadable signature file ({exc}).") from exc
     key = _key()
+    if meta.get("alg") == "hmac-sha256" and not key:
+        raise ModelIntegrityError(f"{path}: signature is an HMAC but DRIFTGUARD_MODEL_KEY is not set.")
     if key and meta.get("alg") != "hmac-sha256":
         raise ModelIntegrityError(f"{path}: DRIFTGUARD_MODEL_KEY is set but signature is not an HMAC.")
-    alg, digest = _digest(path, key if meta.get("alg") == "hmac-sha256" else None)
-    if not hmac.compare_digest(digest, meta.get("digest", "")):
+    alg, digest = _digest(path, key if meta.get("alg") == "hmac-sha256" else None, data)
+    if not hmac.compare_digest(digest, str(meta.get("digest", ""))):
         raise ModelIntegrityError(f"{path}: signature mismatch - file was modified or is corrupt.")
+
+
+def read_verified(path: str | Path) -> bytes:
+    """Read the file once and verify the signature over those exact bytes (no check/use gap)."""
+    path = Path(path)
+    data = path.read_bytes()
+    verify_file(path, data)
+    return data

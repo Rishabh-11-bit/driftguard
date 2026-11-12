@@ -150,3 +150,12 @@ def test_oversized_and_invisible_content_is_sanitised_before_storage():
     p.process(_cand(content="a\u200bb" + "x" * 50_000))
     stored = mem.items[0]["text"]
     assert len(stored) <= MAX_WRITE_CHARS and "\u200b" not in stored
+
+
+def test_malformed_signature_file_raises_integrity_error(tmp_path):
+    from driftguard.security import ModelIntegrityError, verify_file
+    f = tmp_path / "m.pkl"
+    f.write_bytes(b"data")
+    (tmp_path / "m.pkl.sig").write_text("{not json", encoding="utf-8")
+    with pytest.raises(ModelIntegrityError):
+        verify_file(f)

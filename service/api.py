@@ -16,8 +16,9 @@ Security properties (see SECURITY.md):
 
 from __future__ import annotations
 
-import hmac
+import hashlib
 import os
+import threading
 import time
 from collections import defaultdict, deque
 from typing import Callable, Literal
@@ -31,6 +32,8 @@ from driftguard.security import MAX_QUERY_CHARS, MAX_WRITE_CHARS
 
 MAX_BODY_BYTES = 16 * 1024
 RATE_LIMIT_PER_MIN = int(os.getenv("DRIFTGUARD_RATE_LIMIT", "120"))
+MAX_MEMORIES_PER_TENANT = int(os.getenv("DRIFTGUARD_MAX_MEMORIES", "1000"))
+MAX_PENDING_PER_TENANT = int(os.getenv("DRIFTGUARD_MAX_PENDING", "500"))
 Origin = Literal["user_turn", "tool_output", "retrieved_doc", "agent_reflection", "unknown"]
 
 
@@ -53,11 +56,17 @@ class ReviewRequest(BaseModel):
     decision: Literal["approve", "reject"]
 
 
+class MemoryFull(RuntimeError):
+    pass
+
+
 class _ListMemory:
     def __init__(self) -> None:
         self.items: list[dict] = []
 
     def add(self, text: str, metadata: dict | None = None) -> str:
+        if len(self.items) >= MAX_MEMORIES_PER_TENANT:
+            raise MemoryFull("tenant memory quota reached")
         self.items.append({"text": text, "metadata": metadata or {}})
         return str(len(self.items))
 
@@ -67,6 +76,7 @@ class _ListMemory:
 
 class _Tenant:
     def __init__(self, classifier, extractor) -> None:
+        self.lock = threading.Lock()
         self.memory = _ListMemory()
         self.queue = InMemoryReviewQueue()
         self.pipeline = WritePipeline(self.memory, classifier, EnforcementPolicy(quarantine_queue=self.queue))
@@ -78,8 +88,10 @@ def _parse_keys(raw: str) -> dict[str, str]:
     keys: dict[str, str] = {}
     for pair in filter(None, (p.strip() for p in raw.split(","))):
         key, _, tenant = pair.partition(":")
-        if len(key) < 16 or not tenant:
-            raise RuntimeError("DRIFTGUARD_API_KEYS entries must look like '<key >=16 chars>:<tenant>'")
+        if len(key) < 16 or not tenant or ":" in tenant:
+            raise RuntimeError("API key entries must look like '<key >=16 chars, no colon>:<tenant>'")
+        if key in keys:
+            raise RuntimeError("duplicate API key in configuration")
         keys[key] = tenant
     return keys
 
@@ -88,13 +100,21 @@ def create_app(
     api_keys: dict[str, str] | None = None,
     classifier=None,
     extractor=None,
+    reviewer_keys: dict[str, str] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> FastAPI:
     if api_keys is None:
         api_keys = _parse_keys(os.getenv("DRIFTGUARD_API_KEYS", ""))
     if not api_keys:
         raise RuntimeError("No API keys configured (DRIFTGUARD_API_KEYS). Refusing to start unauthenticated.")
+    if reviewer_keys is None:
+        reviewer_keys = _parse_keys(os.getenv("DRIFTGUARD_REVIEWER_KEYS", ""))
+    if set(reviewer_keys) & set(api_keys):
+        raise RuntimeError("reviewer keys must differ from writer keys (separation of duties)")
     if classifier is None:
+        if not os.getenv("DRIFTGUARD_MODEL_KEY"):
+            raise RuntimeError("DRIFTGUARD_MODEL_KEY is required to load a model in the service "
+                               "(plain SHA-256 signatures do not stop an attacker who can write the model directory).")
         from driftguard.detector.classifier import DriftGuardClassifier
         classifier = DriftGuardClassifier.load(os.getenv("DRIFTGUARD_MODEL_PATH", "models/classifier_v2.pkl"))
     if extractor is None:
@@ -102,35 +122,49 @@ def create_app(
         n_feat = len(getattr(classifier, "_feature_names", None) or [])
         extractor = SemanticFeatureExtractor() if n_feat > 18 else FeatureExtractor()
 
-    app = FastAPI(title="DriftGuard Guard API", version="0.1.0", docs_url="/docs", redoc_url=None)
-    tenants: dict[str, _Tenant] = {}
+    app = FastAPI(title="DriftGuard Guard API", version="0.1.0", docs_url=None, redoc_url=None)
+    tenants: dict[str, _Tenant] = {t: _Tenant(classifier, extractor)
+                                   for t in set(api_keys.values()) | set(reviewer_keys.values())}
+    # keys are looked up by digest: one dict lookup, no per-key compare loop
+    writer_idx = {hashlib.sha256(k.encode()).hexdigest(): (k, t) for k, t in api_keys.items()}
+    reviewer_idx = {hashlib.sha256(k.encode()).hexdigest(): (k, t) for k, t in reviewer_keys.items()}
     hits: dict[str, deque] = defaultdict(deque)
 
     @app.middleware("http")
     async def limit_body(request: Request, call_next):
+        from fastapi.responses import JSONResponse
         length = request.headers.get("content-length")
-        if length and length.isdigit() and int(length) > MAX_BODY_BYTES:
-            from fastapi.responses import JSONResponse
+        if request.method in ("POST", "PUT", "PATCH") and length is None:
+            return JSONResponse({"detail": "Content-Length required"}, status_code=411)  # no chunked bypass
+        if length and (not length.isdigit() or int(length) > MAX_BODY_BYTES):
             return JSONResponse({"detail": "request body too large"}, status_code=413)
         return await call_next(request)
 
-    def auth(x_api_key: str | None = Header(default=None)) -> str:
+    def _authenticate(x_api_key: str | None, index: dict) -> str:
         if x_api_key:
-            for key, tenant in api_keys.items():
-                if hmac.compare_digest(key.encode(), x_api_key.encode()):
-                    now = clock()
-                    q = hits[key]
-                    while q and now - q[0] > 60:
-                        q.popleft()
-                    if len(q) >= RATE_LIMIT_PER_MIN:
-                        raise HTTPException(429, "rate limit exceeded")
-                    q.append(now)
-                    return tenant
+            entry = index.get(hashlib.sha256(x_api_key.encode()).hexdigest())
+            if entry:
+                key, tenant = entry
+                now = clock()
+                q = hits[key]
+                while q and now - q[0] > 60:
+                    q.popleft()
+                if len(q) >= RATE_LIMIT_PER_MIN:
+                    raise HTTPException(429, "rate limit exceeded")
+                q.append(now)
+                return tenant
         raise HTTPException(401, "invalid or missing API key")
 
+    def auth(x_api_key: str | None = Header(default=None)) -> str:
+        return _authenticate(x_api_key, writer_idx)
+
+    def reviewer_auth(x_api_key: str | None = Header(default=None)) -> str:
+        return _authenticate(x_api_key, reviewer_idx)
+
     def tenant_state(tenant: str = Depends(auth)) -> _Tenant:
-        if tenant not in tenants:
-            tenants[tenant] = _Tenant(classifier, extractor)
+        return tenants[tenant]
+
+    def reviewer_state(tenant: str = Depends(reviewer_auth)) -> _Tenant:
         return tenants[tenant]
 
     @app.get("/healthz")
@@ -139,29 +173,38 @@ def create_app(
 
     @app.post("/v1/guard/write", response_model=WriteResponse)
     def guard_write(req: WriteRequest, t: _Tenant = Depends(tenant_state)) -> WriteResponse:
-        res = t.pipeline.process(CandidateWrite(
-            content=req.content, origin=req.origin, session_id=req.session_id,
-            triggering_text=req.triggering_text,
-        ))
+        with t.lock:
+            if len(t.queue.list_pending()) >= MAX_PENDING_PER_TENANT:
+                raise HTTPException(429, "quarantine backlog full; review pending items")
+            if len(t.memory.items) >= MAX_MEMORIES_PER_TENANT:
+                raise HTTPException(507, "memory quota reached")
+            res = t.pipeline.process(CandidateWrite(
+                content=req.content, origin=req.origin, session_id=req.session_id,
+                triggering_text=req.triggering_text,
+            ))
         return WriteResponse(
             verdict=res.class_name, action=res.action, probabilities=list(res.probabilities),
             quarantine_id=res.quarantine_id, latency_ms=res.latency_ms,
         )
 
     @app.get("/v1/quarantine")
-    def list_quarantine(t: _Tenant = Depends(tenant_state)) -> list[dict]:
+    def list_quarantine(t: _Tenant = Depends(reviewer_state)) -> list[dict]:
         return [{"quarantine_id": e.quarantine_id, "text": e.candidate_text,
                  "p_malicious": e.probabilities[0]} for e in t.queue.list_pending()]
 
     @app.post("/v1/quarantine/{qid}/review")
-    def review(qid: str, body: ReviewRequest, t: _Tenant = Depends(tenant_state)) -> dict:
-        pending = {e.quarantine_id: e for e in t.queue.list_pending()}
-        if qid not in pending:  # also prevents cross-tenant access: queues are per tenant
-            raise HTTPException(404, "not found")
-        t.queue.mark_reviewed(qid, body.decision)
-        if body.decision == "approve":
-            t.memory.add(pending[qid].candidate_text, {"reviewed": True})
-        return {"quarantine_id": qid, "decision": body.decision}
+    def review(qid: str, body: ReviewRequest, t: _Tenant = Depends(reviewer_state)) -> dict:
+        with t.lock:
+            pending = {e.quarantine_id: e for e in t.queue.list_pending()}
+            if qid not in pending:  # also prevents cross-tenant access: queues are per tenant
+                raise HTTPException(404, "not found")
+            if body.decision == "approve":
+                try:
+                    t.memory.add(pending[qid].candidate_text, {"reviewed": True})
+                except MemoryFull:
+                    raise HTTPException(507, "memory quota reached")
+            t.queue.mark_reviewed(qid, body.decision)
+            return {"quarantine_id": qid, "decision": body.decision}
 
     return app
 
