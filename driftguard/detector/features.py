@@ -132,8 +132,8 @@ class FeatureExtractor:
                 if ts.tzinfo is None:
                     ts = ts.replace(tzinfo=timezone.utc)
                 timestamps.append(ts)
-            except Exception:
-                pass
+            except (KeyError, TypeError, ValueError):
+                logging.getLogger(__name__).warning("skipping write-history entry with a bad timestamp")
 
         # [2] history span: hours between the oldest remembered write and this write
         features[2] = max((now - min(timestamps)).total_seconds(), 0.0) / 3600.0 if timestamps else 0.0

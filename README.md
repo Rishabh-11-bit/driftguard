@@ -225,7 +225,7 @@ python scripts/run_eval.py --benchmark data/benchmark_hard.jsonl --model models/
 ## Demo UI
 
 ```bash
-pip install streamlit plotly
+pip install -e ".[app]"
 streamlit run app/streamlit_app.py
 ```
 
@@ -248,7 +248,11 @@ unprotected answer. No cloud API key is needed.
 * [`SECURITY.md`](SECURITY.md) — threat model, entry-point table, audit findings (fixed / open) and measured adaptive-attacker results.
 * `python -m scripts.run_adversarial` — evasion evaluation; `scripts.train_robust` — adversarial training; `scripts.run_transform_holdout` — leave-one-evasion-out.
 * `python -m scripts.run_research_eval` — repeated cross-validation with 95 % CIs, baselines, feature-family ablation, McNemar test.
+* `python -m scripts.download_external` - public prompt-injection and persona datasets (Hugging Face); `scripts.run_real_text_eval` / `scripts.run_real_text_controlled` - real-text transfer (the controlled one matches length/prefix and adds style baselines).
+* `python -m scripts.run_stealth_eval` - provenance-reliability experiment; `scripts.run_generalisation` - leave-one-family-out; `scripts.run_independent_eval` - LLM-written text (`--attack-as-note` for note-style attacks).
+* `python -m scripts.train_v2` / `scripts.train_v3` - v2 (semantic features + real text) and v3 (+ LLM-written notes; needs `scripts.generate_notes`); `scripts.run_blackbox_attack` - query-budgeted LLM attacker; `scripts.run_agent_study` - end-to-end agent study with Wilson intervals.
+* Research paper draft: `paper/driftguard_paper.md`. Threat model and open items: `SECURITY.md`.
 * `python -m scripts.run_independent_eval` — scores trained detectors on free-form text written by a local LLM.
 * **Models are signed.** `DriftGuardClassifier.load` refuses unsigned or modified pickles. After training, a `.sig` file is written automatically; for models from elsewhere, review then `python -m scripts.sign_model <file>`. Set `DRIFTGUARD_MODEL_KEY` to use an HMAC.
-* **Guard API** (`service/api.py`): `DRIFTGUARD_API_KEYS="<key-16+chars>:<tenant>" uvicorn service.api:app --host 127.0.0.1` — API-key auth, per-tenant isolation, rate and size limits. Container: see `Dockerfile`.
+* **Guard API** (`service/api.py`): writer keys `DRIFTGUARD_API_KEYS="<key-16+chars>:<tenant>[@origin|origin]"` (the optional `@` list restricts which `origin` values that key may assert), a **separate** reviewer role `DRIFTGUARD_REVIEWER_KEYS` (writer keys cannot list or approve quarantine), and `DRIFTGUARD_MODEL_KEY` (HMAC key; required to load a model). Start with `uvicorn --factory service.api:create_app --host 127.0.0.1 --no-server-header` and keep a single worker (tenant state is in memory). Per-tenant quotas, per-key rate limits and a failed-login throttle apply. Container: see `Dockerfile`.
 * [`docs/PRODUCT-BRIEF.md`](docs/PRODUCT-BRIEF.md) — path from research prototype to a product, and what evidence is still missing.

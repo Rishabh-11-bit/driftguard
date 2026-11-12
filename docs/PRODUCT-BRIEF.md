@@ -26,10 +26,10 @@ The research prototype is strong enough to demo and to publish, but three things
 
 | Dimension | Score /10 | Evidence |
 |---|---|---|
-| Technical depth | 7 | 18-feature detector, calibrated 3-class model, hardened benchmark, LOFO, adaptive-attacker eval, 98 tests |
-| Evidence quality | 3 | 100% synthetic; held-out family set is easy; no real traces |
-| Security posture | 5 | Major fixes done (signed models, fail-closed, sanitiser); provenance laundering still open |
-| Product readiness | 3 | Streamlit demo only; no API, auth, multi-tenancy, packaging, docs site |
+| Technical depth | 7 | 25-feature detector (18 + 7 semantic), calibrated 3-class model, hardened benchmark, LOFO, adaptive-attacker eval, runtime provenance attribution, 126 tests |
+| Evidence quality | 3 | Synthetic core; a label leak was found and fixed (accuracy 0.997 -> 0.918); length-matched real text shows no transfer for synthetic-trained models; LLM-written note-style attacks are mostly missed; end-to-end, a simple rule filter is at least as good (ASR 0.24 vs 0.36). No real traces. |
+| Security posture | 6 | Signed models verified on the loaded bytes, fail-closed, sanitiser, authenticated API with separate reviewer role, per-tenant quotas/locks, key-to-origin binding, per-session history, failed-login throttle; provenance attribution is heuristic; see SECURITY.md for the remaining list |
+| Product readiness | 4 | Streamlit demo + authenticated multi-tenant Guard API + Dockerfile + CI; no persistence for the API (in-memory tenants), no UI for reviewers, no docs site |
 | Differentiation | 6 | Write-time, provenance-aware, drift-vs-attack distinction. *Moat unproven.* |
 | Commercial readiness | 1 | No licence, no pricing evidence, IP ownership unresolved |
 

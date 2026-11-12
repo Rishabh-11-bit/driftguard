@@ -14,6 +14,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import tempfile
+import threading
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
@@ -127,6 +129,7 @@ class HumanReviewQueue(BaseReviewQueue):
 
     def __init__(self, path: str | Path = "./data/quarantine_queue.jsonl") -> None:
         self.path = Path(path)
+        self._lock = threading.RLock()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
             self.path.touch()
@@ -137,50 +140,56 @@ class HumanReviewQueue(BaseReviewQueue):
 
     def enqueue(self, entry: QuarantineEntry) -> None:
         """Append an entry to the queue."""
-        with self.path.open("a", encoding="utf-8") as f:
+        with self._lock, self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(entry.to_dict()) + "\n")
         logger.info(f"[Quarantine] Enqueued entry {entry.quarantine_id[:8]}…")
 
+    def _read_all(self) -> list[QuarantineEntry]:
+        """Read every entry; a corrupt or tampered line is skipped (and logged), never fatal."""
+        entries: list[QuarantineEntry] = []
+        with self._lock, self.path.open("r", encoding="utf-8") as f:
+            for n, line in enumerate(f, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entries.append(QuarantineEntry.from_dict(json.loads(line)))
+                except (ValueError, TypeError, KeyError):
+                    logger.warning("[Quarantine] skipping malformed line %d in %s", n, self.path)
+        return entries
+
     def list_pending(self) -> list[QuarantineEntry]:
         """Return all unreviewed entries."""
-        entries = []
-        with self.path.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    e = QuarantineEntry.from_dict(json.loads(line))
-                    if not e.reviewed:
-                        entries.append(e)
-        return entries
+        return [e for e in self._read_all() if not e.reviewed]
 
     def list_all(self) -> list[QuarantineEntry]:
         """Return all entries (reviewed and unreviewed)."""
-        entries = []
-        with self.path.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    entries.append(QuarantineEntry.from_dict(json.loads(line)))
-        return entries
+        return self._read_all()
 
     def mark_reviewed(self, quarantine_id: str, decision: str) -> None:
-        """
-        Mark an entry as reviewed with a decision ('approve' or 'reject').
-        Rewrites the entire file (acceptable for research-scale queues).
-        """
-        entries = self.list_all()
-        updated = False
-        for e in entries:
-            if e.quarantine_id == quarantine_id:
-                e.reviewed = True
-                e.review_decision = decision
-                updated = True
-        if not updated:
-            raise KeyError(f"Quarantine entry {quarantine_id!r} not found.")
-        # Rewrite
-        with self.path.open("w", encoding="utf-8") as f:
+        """Mark an entry reviewed ('approve' or 'reject'); the file is replaced atomically."""
+        with self._lock:
+            entries = self._read_all()
+            updated = False
             for e in entries:
-                f.write(json.dumps(e.to_dict()) + "\n")
+                if e.quarantine_id == quarantine_id:
+                    e.reviewed = True
+                    e.review_decision = decision
+                    updated = True
+            if not updated:
+                raise KeyError(f"Quarantine entry {quarantine_id!r} not found.")
+            fd, tmp = tempfile.mkstemp(dir=self.path.parent, prefix=self.path.name, suffix=".tmp")
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    for e in entries:
+                        f.write(json.dumps(e.to_dict()) + "\n")
+                os.replace(tmp, self.path)
+            except BaseException:
+                try:
+                    os.unlink(tmp)
+                except OSError:
+                    pass
+                raise
 
 
 class InMemoryReviewQueue(BaseReviewQueue):

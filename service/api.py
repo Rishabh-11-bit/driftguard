@@ -20,7 +20,7 @@ import hashlib
 import os
 import threading
 import time
-from collections import defaultdict, deque
+from collections import OrderedDict, defaultdict, deque
 from typing import Callable, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -34,6 +34,9 @@ MAX_BODY_BYTES = 16 * 1024
 RATE_LIMIT_PER_MIN = int(os.getenv("DRIFTGUARD_RATE_LIMIT", "120"))
 MAX_MEMORIES_PER_TENANT = int(os.getenv("DRIFTGUARD_MAX_MEMORIES", "1000"))
 MAX_PENDING_PER_TENANT = int(os.getenv("DRIFTGUARD_MAX_PENDING", "500"))
+MAX_SESSIONS_PER_TENANT = int(os.getenv("DRIFTGUARD_MAX_SESSIONS", "200"))
+AUTH_FAILURES_PER_MIN = int(os.getenv("DRIFTGUARD_AUTH_FAILURES", "20"))
+ALL_ORIGINS = frozenset({"user_turn", "tool_output", "retrieved_doc", "agent_reflection", "unknown"})
 Origin = Literal["user_turn", "tool_output", "retrieved_doc", "agent_reflection", "unknown"]
 
 
@@ -75,23 +78,47 @@ class _ListMemory:
 
 
 class _Tenant:
+    """Isolated memory + quarantine queue, with one write pipeline (and so one write history) per session."""
+
     def __init__(self, classifier, extractor) -> None:
         self.lock = threading.Lock()
         self.memory = _ListMemory()
         self.queue = InMemoryReviewQueue()
-        self.pipeline = WritePipeline(self.memory, classifier, EnforcementPolicy(quarantine_queue=self.queue))
-        if extractor is not None:
-            self.pipeline._extractor = extractor
+        self._classifier, self._extractor = classifier, extractor
+        self._pipelines: OrderedDict[str, WritePipeline] = OrderedDict()
+
+    def pipeline_for(self, session_id: str) -> WritePipeline:
+        """History is keyed by session, so one session cannot shape the temporal features of another."""
+        pl = self._pipelines.get(session_id)
+        if pl is None:
+            pl = WritePipeline(self.memory, self._classifier, EnforcementPolicy(quarantine_queue=self.queue))
+            if self._extractor is not None:
+                pl._extractor = self._extractor
+            self._pipelines[session_id] = pl
+            while len(self._pipelines) > MAX_SESSIONS_PER_TENANT:
+                self._pipelines.popitem(last=False)          # evict the oldest session
+        else:
+            self._pipelines.move_to_end(session_id)
+        return pl
 
 
-def _parse_keys(raw: str) -> dict[str, str]:
+def _parse_keys(raw: str, origins: dict[str, frozenset] | None = None) -> dict[str, str]:
+    """Parse '<key>:<tenant>[@origin1|origin2]' entries. The optional origin list limits which `origin`
+    values that key may assert (e.g. an agent-runtime key may only send tool_output / retrieved_doc)."""
     keys: dict[str, str] = {}
     for pair in filter(None, (p.strip() for p in raw.split(","))):
-        key, _, tenant = pair.partition(":")
+        key, _, rest = pair.partition(":")
+        tenant, _, allowed = rest.partition("@")
         if len(key) < 16 or not tenant or ":" in tenant:
-            raise RuntimeError("API key entries must look like '<key >=16 chars, no colon>:<tenant>'")
+            raise RuntimeError("API key entries must look like '<key >=16 chars, no colon>:<tenant>[@origin|origin]'")
         if key in keys:
             raise RuntimeError("duplicate API key in configuration")
+        if allowed:
+            bad = set(allowed.split("|")) - ALL_ORIGINS
+            if bad:
+                raise RuntimeError(f"unknown origin(s) in key configuration: {sorted(bad)}")
+            if origins is not None:
+                origins[key] = frozenset(allowed.split("|"))
         keys[key] = tenant
     return keys
 
@@ -101,10 +128,14 @@ def create_app(
     classifier=None,
     extractor=None,
     reviewer_keys: dict[str, str] | None = None,
+    key_origins: dict[str, frozenset] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> FastAPI:
     if api_keys is None:
-        api_keys = _parse_keys(os.getenv("DRIFTGUARD_API_KEYS", ""))
+        env_origins: dict[str, frozenset] = {}
+        api_keys = _parse_keys(os.getenv("DRIFTGUARD_API_KEYS", ""), env_origins)
+        key_origins = key_origins or env_origins
+    key_origins = key_origins or {}
     if not api_keys:
         raise RuntimeError("No API keys configured (DRIFTGUARD_API_KEYS). Refusing to start unauthenticated.")
     if reviewer_keys is None:
@@ -140,45 +171,52 @@ def create_app(
             return JSONResponse({"detail": "request body too large"}, status_code=413)
         return await call_next(request)
 
-    def _authenticate(x_api_key: str | None, index: dict) -> str:
+    auth_failures: dict[str, deque] = defaultdict(deque)
+
+    def _authenticate(request: Request, x_api_key: str | None, index: dict) -> tuple[str, str]:
+        now = clock()
+        host = request.client.host if request.client else "unknown"
+        fq = auth_failures[host]
+        while fq and now - fq[0] > 60:
+            fq.popleft()
+        if len(fq) >= AUTH_FAILURES_PER_MIN:
+            raise HTTPException(429, "too many failed authentication attempts")
         if x_api_key:
             entry = index.get(hashlib.sha256(x_api_key.encode()).hexdigest())
             if entry:
                 key, tenant = entry
-                now = clock()
                 q = hits[key]
                 while q and now - q[0] > 60:
                     q.popleft()
                 if len(q) >= RATE_LIMIT_PER_MIN:
                     raise HTTPException(429, "rate limit exceeded")
                 q.append(now)
-                return tenant
+                return tenant, key
+        fq.append(now)
         raise HTTPException(401, "invalid or missing API key")
 
-    def auth(x_api_key: str | None = Header(default=None)) -> str:
-        return _authenticate(x_api_key, writer_idx)
+    def writer(request: Request, x_api_key: str | None = Header(default=None)) -> tuple[_Tenant, frozenset]:
+        tenant, key = _authenticate(request, x_api_key, writer_idx)
+        return tenants[tenant], key_origins.get(key, ALL_ORIGINS)
 
-    def reviewer_auth(x_api_key: str | None = Header(default=None)) -> str:
-        return _authenticate(x_api_key, reviewer_idx)
-
-    def tenant_state(tenant: str = Depends(auth)) -> _Tenant:
-        return tenants[tenant]
-
-    def reviewer_state(tenant: str = Depends(reviewer_auth)) -> _Tenant:
-        return tenants[tenant]
+    def reviewer_state(request: Request, x_api_key: str | None = Header(default=None)) -> _Tenant:
+        return tenants[_authenticate(request, x_api_key, reviewer_idx)[0]]
 
     @app.get("/healthz")
     def healthz() -> dict:
         return {"status": "ok"}
 
     @app.post("/v1/guard/write", response_model=WriteResponse)
-    def guard_write(req: WriteRequest, t: _Tenant = Depends(tenant_state)) -> WriteResponse:
+    def guard_write(req: WriteRequest, ctx: tuple[_Tenant, frozenset] = Depends(writer)) -> WriteResponse:
+        t, allowed = ctx
+        if req.origin not in allowed:
+            raise HTTPException(403, f"this API key may not assert origin {req.origin!r}")
         with t.lock:
             if len(t.queue.list_pending()) >= MAX_PENDING_PER_TENANT:
                 raise HTTPException(429, "quarantine backlog full; review pending items")
             if len(t.memory.items) >= MAX_MEMORIES_PER_TENANT:
                 raise HTTPException(507, "memory quota reached")
-            res = t.pipeline.process(CandidateWrite(
+            res = t.pipeline_for(req.session_id).process(CandidateWrite(
                 content=req.content, origin=req.origin, session_id=req.session_id,
                 triggering_text=req.triggering_text,
             ))

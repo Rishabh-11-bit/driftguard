@@ -233,7 +233,9 @@ class WritePipeline:
         """Texts currently in the memory store (empty if the backend can't list)."""
         try:
             return [e["text"] for e in self.memory_backend.list_all()]
-        except Exception:
+        except Exception as exc:
+            # Features that compare against existing memories degrade to zero; make that visible
+            logger.warning("[WritePipeline] could not list existing memories (%s); novelty features zeroed", exc)
             return []
 
     def _commit(
