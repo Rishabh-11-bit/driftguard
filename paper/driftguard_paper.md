@@ -9,7 +9,7 @@
 
 LLM agents with persistent memory can be steered by *memory poisoning*: an attacker plants an entry that later changes the agent's behaviour. Blocking every memory change would also block the personalisation users want, because genuine preference *drift* ("I moved to Bengaluru") looks structurally like an attack. We study **write-time three-class classification** — malicious, benign drift, ordinary learning — with actions quarantine / admit-and-flag / admit. Our detector scores each candidate write with 18 features (provenance, temporal, consistency, content) plus 7 semantic attack-intent features, using a calibrated random forest.
 
-We report results the way a sceptical reviewer would demand. (1) On a synthetic benchmark the model reaches 0.918 ± 0.018 accuracy under repeated cross-validation after label-preserving *hardening* (corrected 95 % CI [0.890, 0.944]) (0.997 on the raw benchmark, which we show is inflated by generator shortcuts). (2) **We found and fixed a label leak in our own feature pipeline**: session age was computed against the wall clock at extraction time and, because the benchmark is generated class by class, identified the class almost perfectly (AUROC 0.94 on random labels); the burst-window features were also dead in training. All numbers here are post-fix. (3) A redesigned, entity-grouped stealth experiment (5 datasets, intervals) shows provenance helps only in proportion to its reliability: at reliability 0.5 it is at chance (AUROC 0.49) and adds nothing; at 0.8 it adds about 0.09 AUROC over text alone (0.851 vs 0.759) and at 0.95 provenance alone reaches 0.95. (4) A combined adaptive attacker cuts detection to 0.23; adversarial augmentation restores 1.00, and holding out each evasion type still gives 0.90–1.00. (5) Leave-one-attack-family-out detection is weak (0.31 on MINJA) and the apparent fix from adding real injection text (0.89) is confounded: on a length-and-prefix-matched real-text set the synthetic-trained models are at chance (AUROC 0.51-0.57) and a TF-IDF baseline reaches 1.00, so we do not claim real-text transfer. (6) On free-form text written by an independent LLM, with context leakage removed, accuracy falls to 0.37-0.52 and attacks phrased as ordinary memory notes are missed 57-77 % of the time, so in-template performance does not transfer. (7) In an end-to-end study with a local 8B agent (300 scenarios, Wilson intervals) every defence reduces attack success from 0.96, but a simple rule-based filter is at least as good as DriftGuard (ASR 0.24 vs 0.36 for v2, overlapping intervals); we do not claim an end-to-end advantage.
+We report results the way a sceptical reviewer would demand. (1) On a synthetic benchmark the model reaches 0.918 ± 0.018 accuracy under repeated cross-validation after label-preserving *hardening* (corrected 95 % CI [0.890, 0.944]) (0.997 on the raw benchmark, which we show is inflated by generator shortcuts). (2) **We found and fixed a label leak in our own feature pipeline**: session age was computed against the wall clock at extraction time and, because the benchmark is generated class by class, identified the class almost perfectly (AUROC 0.94 on random labels); the burst-window features were also dead in training. All numbers here are post-fix. (3) A redesigned, entity-grouped stealth experiment (5 datasets, intervals) shows provenance helps only in proportion to its reliability: at reliability 0.5 it is at chance (AUROC 0.49) and adds nothing; at 0.8 it adds about 0.09 AUROC over text alone (0.851 vs 0.759) and at 0.95 provenance alone reaches 0.95. (4) A combined adaptive attacker cuts detection to 0.23; adversarial augmentation restores 1.00, and holding out each evasion type still gives 0.90–1.00. (5) Leave-one-attack-family-out detection is weak (0.31 on MINJA) and the apparent fix from adding real injection text (0.89) is confounded: on a length-and-prefix-matched real-text set the synthetic-trained models are at chance (AUROC 0.51-0.57) and a TF-IDF baseline reaches 1.00, so we do not claim real-text transfer. (6) On free-form text written by an independent LLM, with context leakage removed, the detector trained only on templates falls to 0.37-0.52 accuracy and misses 57-77 % of note-style attacks; training on 450 LLM-written notes (v3) lifts malicious-vs-rest AUROC on held-out writers and goals to 0.80-0.92 and cuts false alarms (still 16-35 %), but a plain TF-IDF text classifier reaches 0.88-0.99, so the gain is largely vocabulary. (7) In an end-to-end study with a local 8B agent (300 scenarios, Wilson intervals) every defence reduces attack success from 0.96, but a simple rule-based filter is at least as good as DriftGuard (ASR 0.24 vs 0.36 for v2, overlapping intervals); we do not claim an end-to-end advantage.
 
 ## 1. Introduction
 
@@ -166,6 +166,28 @@ A local LLM (llama3.2:1b) wrote 180 free-form entries (60 per class); detectors 
 
 With the leak removed the 0.66-0.67 reported in an earlier draft becomes 0.51-0.52 for the synthetic-trained models, and in condition B attack recall falls to 0.23-0.43. v2's 0.98 in A is largely a style effect: it drops to 0.43 when the attack imitates the benign note format. The honest reading is that **the detectors do not currently catch LLM-written attacks that look like ordinary memory notes, and they quarantine a third to a half of benign free-form notes.** The generator is a 1B model and n = 60 per class (95 % intervals roughly +/-0.12 on a recall), but the drop is far larger than that.
 
+### 5.7b Training on LLM-written memory notes (v3)
+
+To address §5.7 we generated memory notes with local LLMs (`scripts/generate_notes.py`) and trained **v3** = v2 + 450 notes written by llama3.2:1b (150 per class: note-style, injected-sentence and first-person attack styles; drift and ordinary notes in note and first-person styles) about *training* attack goals and topics. Held-out sets use disjoint goals/topics: **A** llama3.2:1b, new goals (180 notes); **B** phi3.5 (an unseen writer of a different model family), note-style (90); **C** phi3.5, first-person voice, attacks and benign alike (90). Context features come from random benchmark entries of any class, so only the text carries signal. Attack recall, false-alarm rate (benign quarantined), 3-class accuracy and malicious-vs-rest AUROC, with Wilson 95 % intervals on the rates (`scripts/train_v3.py`):
+
+| Set | Model | Attack recall | False alarm | 3-class acc. | AUROC |
+|---|---|---|---|---|---|
+| Benchmark test | v2 | 1.00 [0.91, 1.00] | 0.05 [0.02, 0.12] | 0.93 | 1.00 |
+| Benchmark test | **v3** | 1.00 [0.91, 1.00] | 0.01 [0.00, 0.07] | 0.93 | 1.00 |
+| A (seen writer, new goals) | v2 | 0.40 [0.29, 0.53] | 0.23 [0.16, 0.31] | 0.49 | 0.68 |
+| A | **v3** | 0.52 [0.39, 0.64] | 0.16 [0.10, 0.23] | 0.63 | 0.80 |
+| A | TF-IDF, text only | 0.47 [0.35, 0.59] | 0.00 [0.00, 0.03] | 0.49 | 0.92 |
+| B (unseen writer) | v2 | 0.77 [0.59, 0.88] | 0.57 [0.44, 0.68] | 0.41 | 0.63 |
+| B | **v3** | 0.90 [0.74, 0.97] | 0.35 [0.24, 0.48] | 0.57 | 0.84 |
+| B | TF-IDF, text only | 0.37 [0.22, 0.55] | 0.02 [0.00, 0.09] | 0.44 | 0.88 |
+| C (unseen writer + style) | v2 | 0.97 [0.83, 0.99] | 0.68 [0.56, 0.79] | 0.48 | 0.76 |
+| C | **v3** | 1.00 [0.89, 1.00] | 0.35 [0.24, 0.48] | 0.67 | 0.92 |
+| C | TF-IDF, text only | 0.83 [0.66, 0.93] | 0.00 [0.00, 0.06] | 0.61 | 0.99 |
+
+On the length-matched real-text set of §5.6 (v2 and v3 both scored on the same 353 strings neither saw in training): v3 AUROC 0.87, attack TPR 0.58, false alarm 0.04, versus v2 0.79 / 0.49 / 0.10.
+
+What this shows, and what it does not. Training on LLM-written notes helps on every held-out set: AUROC rises by 0.12-0.21 and false alarms fall from 0.57-0.68 to 0.35 on the unseen writer, with no loss on the benchmark. It does **not** make the detector good: a third of benign free-form notes are still quarantined, and **a plain bag-of-words classifier trained on the same notes reaches higher AUROC (0.88-0.99) and far fewer false alarms**, so much of the gain is vocabulary of LLM-written attacks rather than structure, provenance or consistency signal. The sets are small (90-180 notes), all notes come from small local models, and attack goals are drawn from the same families of intent; an adaptive human attacker has not been tested. v3 is therefore evidence that the 25-feature detector can learn from realistic text, and a reminder that a text baseline must always be reported alongside it.
+
 ### 5.8 Black-box adaptive attacker
 
 Query-budgeted attacker (llama3.2:1b rewrites a quarantined attack up to 10 times; 60 attacks per detector). Attack success rate at budget k (ASR@k), where lower is better:
@@ -217,7 +239,7 @@ Memory/knowledge-base poisoning: MINJA [1], AgentPoison [2]; indirect prompt inj
 * Logistic regression matches the forest: the task as generated is nearly linear, so model complexity is not the contribution.
 * Provenance does not drive accuracy on the benchmark (§5.3); its value is shown only in a controlled experiment whose ρ is a parameter (§5.4).
 * Unseen-family generalisation required real training text; with synthetic data alone it is poor (§5.6).
-* Free-form LLM-written text lowers accuracy to near chance and defeats the detectors on note-style attacks (§5.7); this is the main open weakness and the generator is a 1B model with limited diversity.
+* Free-form LLM-written text lowers accuracy to near chance and defeats the detectors on note-style attacks (§5.7); this is the main open weakness. Training on LLM-written notes (v3, §5.7b) improves it, but a TF-IDF baseline is still as good; generators are small local models with limited diversity and the test sets are small.
 * End-to-end results use one 8B local agent, one run, and a scenario set written by the authors; the write proposer is simulated (the injection is assumed to have produced a write). Defences were compared post hoc on the same scenarios, with no paired test and no correction for multiple comparisons.
 * The semantic anchors (exfiltration, promotion, trigger, payment, override) were written by the authors after seeing the benchmark's attack goals, so leave-one-family-out results are not a test of truly unseen intent.
 * Several confidence intervals in §5.1-5.4 are t-intervals over overlapping CV folds and are too narrow (Nadeau-Bengio); the ablation uses a single repeat. Differences of about one point there should not be read as significant.
@@ -229,18 +251,23 @@ Memory/knowledge-base poisoning: MINJA [1], AgentPoison [2]; indirect prompt inj
 ## 9. Reproducibility
 
 ```
-python -m scripts.generate_benchmark --hard
+python -m scripts.generate_benchmark                 # raw benchmark -> data/benchmark.jsonl
+python -m scripts.generate_benchmark --hard --out data/benchmark_hard.jsonl   # hardened benchmark
+python -m scripts.generate_benchmark --harden-file data/held_out.jsonl --out data/held_out_hard.jsonl   # hardened held-out set
 python -m scripts.train_detector --benchmark data/benchmark_hard.jsonl --model-out models/classifier_hard.pkl
 python -m scripts.download_external && python -m scripts.train_v2
-python -m scripts.run_research_eval            # 5.1, 5.3
-python -m scripts.run_stealth_eval             # 5.4
+python -m scripts.run_research_eval                  # 5.1 (plain CIs), 5.3
+python -m scripts.run_stats                          # 5.1 corrected statistics, grouped CV, Holm
+python -m scripts.run_stealth_eval && python -m scripts.run_stealth_v2   # 5.4 (v1 superseded by v2)
 python -m scripts.run_adversarial && python -m scripts.train_robust && python -m scripts.run_transform_holdout   # 5.5
-python -m scripts.run_generalisation && python -m scripts.run_real_text_eval   # 5.6
-python -m scripts.run_independent_eval         # 5.7 (needs Ollama)
-python -m scripts.run_blackbox_attack          # 5.8 (needs Ollama)
-python -m scripts.run_agent_study              # 5.9 (needs Ollama)
+python -m scripts.run_generalisation && python -m scripts.run_real_text_eval && python -m scripts.run_real_text_controlled   # 5.6
+python -m scripts.run_independent_eval && python -m scripts.run_independent_eval --attack-as-note   # 5.7 (needs Ollama)
+python -m scripts.generate_notes && python -m scripts.train_v3   # 5.7b (needs Ollama: llama3.2:1b, phi3.5)
+python -m scripts.run_blackbox_attack                # 5.8 (needs Ollama)
+python -m scripts.run_agent_study --n-per 100 --agent-model llama3:latest --out results_research/agent_big   # 5.9
+python -m scripts.make_manifest                      # git SHA, library versions, data hashes, Ollama digests
 ```
-Seeds are fixed. 114 unit and regression tests run with `pytest`.
+Generation seeds are fixed, but LLM-written text and agent behaviour depend on the local Ollama model builds; their digests and the hashes of all data files are recorded in `results_research/manifest.json`. `data/held_out.jsonl` (two attack families unseen in training) was produced in an earlier session and is not regenerated by a single command here; its hash is in the manifest. Data files under `data/` and models under `models/` are git-ignored: regenerate them with the commands above (the LLM-written sets are cached in `data/independent_texts*.jsonl` and `data/llm_notes.jsonl`). 126 unit and regression tests run with `pytest`.
 
 ## 10. Future work
 

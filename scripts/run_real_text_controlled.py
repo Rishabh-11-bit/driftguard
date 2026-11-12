@@ -100,7 +100,7 @@ def main(
     ext_dir: Path = Path("data/external"),
     benchmark: Path = Path("data/benchmark_hard.jsonl"),
     models: list[Path] = [Path("models/classifier_hard.pkl"), Path("models/classifier_robust.pkl"),
-                          Path("models/classifier_v2.pkl")],
+                          Path("models/classifier_v2.pkl"), Path("models/classifier_v3.pkl")],
     out: Path = Path("results_research"),
     seed: int = 0,
 ) -> None:
@@ -132,7 +132,7 @@ def main(
     tf = TfidfVectorizer(ngram_range=(1, 2), min_df=2, sublinear_tf=True).fit_transform(texts)
     result["baselines"]["tf-idf logistic (CV AUROC)"] = dict(zip(("mean", "std"), cv_auroc(lambda: LogisticRegression(max_iter=1000), tf, y, seed)))
 
-    # zero-shot detectors; v2 trained on the first half of a seed-42 shuffle -> mask those strings
+    # zero-shot detectors; v2 and v3 trained on the first half of a seed-42 shuffle -> mask those strings
     a42, b42 = load_real(ext_dir, 600, random.Random(42))
     h = len(a42) // 2
     seen = [_cut(_core(s)).lower() for s in a42[:h] + b42[:h]]
@@ -150,7 +150,7 @@ def main(
         k = len(d._feature_names or []) or 18
         pred = np.asarray(d.predict(X[:, :k]))
         proba = d.predict_proba(X[:, :k])[:, 0]
-        mask = unseen if m.stem == "classifier_v2" else np.ones(len(y), bool)
+        mask = unseen if m.stem in ("classifier_v2", "classifier_v3") else np.ones(len(y), bool)
         if mask.sum() > 20 and len(set(y[mask])) == 2:
             r = scores(y[mask], pred[mask], proba[mask])
             r["n_scored"] = int(mask.sum())

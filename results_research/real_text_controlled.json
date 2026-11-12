@@ -21,6 +21,12 @@
       "false_alarm": 0.1013215859030837,
       "auroc": 0.790224459827984,
       "n_scored": 353
+    },
+    "classifier_v3": {
+      "attack_tpr": 0.5793650793650794,
+      "false_alarm": 0.039647577092511016,
+      "auroc": 0.8701139780434934,
+      "n_scored": 353
     }
   },
   "baselines": {
