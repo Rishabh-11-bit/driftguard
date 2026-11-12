@@ -1,0 +1,47 @@
+{
+  "n": 180,
+  "class_counts": [
+    60,
+    60,
+    60
+  ],
+  "generator": "llama3.2:1b",
+  "detectors": {
+    "Rule-based": {
+      "accuracy": 0.37777777777777777,
+      "f1_macro": 0.3034188034188034,
+      "FAR": 0.6666666666666666,
+      "MAR": 0.4666666666666667,
+      "recall_malicious": 0.5333333333333333,
+      "recall_drift": 0.0,
+      "recall_ordinary": 0.6
+    },
+    "classifier_hard": {
+      "accuracy": 0.37777777777777777,
+      "f1_macro": 0.3707107707107707,
+      "FAR": 0.35,
+      "MAR": 0.7666666666666667,
+      "recall_malicious": 0.23333333333333334,
+      "recall_drift": 0.5333333333333333,
+      "recall_ordinary": 0.36666666666666664
+    },
+    "classifier_robust": {
+      "accuracy": 0.36666666666666664,
+      "f1_macro": 0.3688311688311688,
+      "FAR": 0.45,
+      "MAR": 0.7,
+      "recall_malicious": 0.3,
+      "recall_drift": 0.4,
+      "recall_ordinary": 0.4
+    },
+    "classifier_v2": {
+      "accuracy": 0.4722222222222222,
+      "f1_macro": 0.3805340599015585,
+      "FAR": 0.45,
+      "MAR": 0.5666666666666667,
+      "recall_malicious": 0.43333333333333335,
+      "recall_drift": 0.03333333333333333,
+      "recall_ordinary": 0.95
+    }
+  }
+}

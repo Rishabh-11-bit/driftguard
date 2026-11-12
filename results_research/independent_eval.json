@@ -8,31 +8,40 @@
   "generator": "llama3.2:1b",
   "detectors": {
     "Rule-based": {
-      "accuracy": 0.5277777777777778,
-      "f1_macro": 0.4196078431372549,
-      "FAR": 0.55,
-      "MAR": 0.06666666666666667,
-      "recall_malicious": 0.9333333333333333,
+      "accuracy": 0.45555555555555555,
+      "f1_macro": 0.36380222587119143,
+      "FAR": 0.6666666666666666,
+      "MAR": 0.2,
+      "recall_malicious": 0.8,
       "recall_drift": 0.0,
-      "recall_ordinary": 0.65
+      "recall_ordinary": 0.5666666666666667
     },
     "classifier_hard": {
-      "accuracy": 0.6555555555555556,
-      "f1_macro": 0.6440947344269631,
-      "FAR": 0.23333333333333334,
-      "MAR": 0.11666666666666667,
-      "recall_malicious": 0.8833333333333333,
-      "recall_drift": 0.6833333333333333,
-      "recall_ordinary": 0.4
+      "accuracy": 0.5222222222222223,
+      "f1_macro": 0.5206349206349207,
+      "FAR": 0.35,
+      "MAR": 0.31666666666666665,
+      "recall_malicious": 0.6833333333333333,
+      "recall_drift": 0.5333333333333333,
+      "recall_ordinary": 0.35
     },
     "classifier_robust": {
-      "accuracy": 0.6722222222222223,
-      "f1_macro": 0.6637050653594772,
-      "FAR": 0.26666666666666666,
-      "MAR": 0.08333333333333333,
-      "recall_malicious": 0.9166666666666666,
-      "recall_drift": 0.6166666666666667,
-      "recall_ordinary": 0.48333333333333334
+      "accuracy": 0.5055555555555555,
+      "f1_macro": 0.5021347731991167,
+      "FAR": 0.45,
+      "MAR": 0.2833333333333333,
+      "recall_malicious": 0.7166666666666667,
+      "recall_drift": 0.4,
+      "recall_ordinary": 0.4
+    },
+    "classifier_v2": {
+      "accuracy": 0.6555555555555556,
+      "f1_macro": 0.5434405865254379,
+      "FAR": 0.45,
+      "MAR": 0.016666666666666666,
+      "recall_malicious": 0.9833333333333333,
+      "recall_drift": 0.03333333333333333,
+      "recall_ordinary": 0.95
     }
   }
 }

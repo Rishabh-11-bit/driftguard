@@ -103,3 +103,17 @@ Do not include real personal data in reports.
 - **F-03 update: provenance laundering.** The original agent labelled every write `agent_reflection`, the highest default trust (0.9). `driftguard/provenance/attribution.py` now attributes a write to the least-trusted source it is grounded in (token containment >= 0.5). This is heuristic: paraphrased injected content can still be attributed to the user.
 - **Adaptive attackers.** Scripted evasions: combined evasion drops the standard model to 0.23 detection; the adversarially trained model holds 1.00 in-distribution and 0.90-1.00 leave-one-evasion-out. Query-budgeted LLM attacker (60 attacks, 10 queries): ASR@10 is 0.08 (robust) to 0.15 (v2) with runtime attribution, 0.80 for the raw model. Detection is not a guarantee; add rate limiting on repeated quarantined writes.
 - **F-11 Dependencies.** `pip-audit` flagged fastapi 0.109/starlette 0.35 (upgraded, pinned in the `service` extra). Remaining advisories are in the wider environment (torch, transformers, langchain, etc.) and should be re-audited in CI.
+
+## Addendum 2: Guard API hardening after the ECC security review
+
+Fixed: **self-approval of quarantine** (writer keys can no longer list or review; a separate `DRIFTGUARD_REVIEWER_KEYS` role is required and must differ from writer keys); **body-size bypass** (POST without `Content-Length`, e.g. chunked, is rejected with 411); **unbounded growth** (per-tenant caps: 1000 memories, 500 pending quarantine items, with 507/429); **race conditions** (tenants created eagerly, per-tenant lock around write and review); **key handling** (keys are looked up by SHA-256 digest, duplicate keys and tenants containing ':' are rejected); **model signing** (the signature is verified over the exact bytes that are unpickled, malformed signature files raise `ModelIntegrityError`, an HMAC signature without `DRIFTGUARD_MODEL_KEY` is refused, and the service will not load a model without `DRIFTGUARD_MODEL_KEY`); `/docs` disabled. CI `bandit` previously failed on the intentional, signature-gated `pickle.loads`; it is now annotated `# nosec B301` with the reason.
+
+Still open (accepted residual risk, in priority order):
+1. `origin` is caller-supplied: a client can claim `user_turn`. Bind each key to an allowed origin set.
+2. Write history is shared by all sessions of a tenant and `session_id` is client-chosen, so one session can shape the temporal features seen by others. Key history by (tenant, session).
+3. Failed-auth requests are not throttled (the rate limit applies only after a key matches).
+4. The JSONL and Redis review queues are not tenant-aware or concurrency-safe; the API uses the in-memory queue only.
+5. Quarantined text is stored unencrypted, and `chmod` has no effect on Windows.
+6. Pickle remains the model format; HMAC signing mitigates but a non-pickle format (skops/ONNX) would remove the class of risk.
+7. Fail-closed quarantine can be abused to fill the review queue with inputs that make feature extraction raise (now bounded by the pending cap).
+8. `uvicorn service.api:app` fails with an opaque error when no keys are set; prefer `create_app()` via a factory.

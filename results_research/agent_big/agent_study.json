@@ -1,0 +1,409 @@
+{
+  "No defence": {
+    "block_attack": 0.0,
+    "asr": 0.96,
+    "exposure": 1.0,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.92,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.0,
+        0.037
+      ],
+      "asr": [
+        0.902,
+        0.984
+      ],
+      "exposure": [
+        0.963,
+        1.0
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.85,
+        0.959
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "Rule-based": {
+    "block_attack": 0.76,
+    "asr": 0.24,
+    "exposure": 0.24,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.92,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.668,
+        0.833
+      ],
+      "asr": [
+        0.167,
+        0.332
+      ],
+      "exposure": [
+        0.167,
+        0.332
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.85,
+        0.959
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "LLM judge (local)": {
+    "block_attack": 0.46,
+    "asr": 0.5,
+    "exposure": 0.54,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.92,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.366,
+        0.557
+      ],
+      "asr": [
+        0.404,
+        0.596
+      ],
+      "exposure": [
+        0.443,
+        0.634
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.85,
+        0.959
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-hard, legacy origin": {
+    "block_attack": 0.57,
+    "asr": 0.43,
+    "exposure": 0.43,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.91,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.472,
+        0.663
+      ],
+      "asr": [
+        0.337,
+        0.528
+      ],
+      "exposure": [
+        0.337,
+        0.528
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.838,
+        0.952
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-hard, runtime attribution": {
+    "block_attack": 0.52,
+    "asr": 0.47,
+    "exposure": 0.48,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.82,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.423,
+        0.615
+      ],
+      "asr": [
+        0.375,
+        0.567
+      ],
+      "exposure": [
+        0.385,
+        0.577
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.733,
+        0.883
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-robust, runtime attribution": {
+    "block_attack": 0.62,
+    "asr": 0.37,
+    "exposure": 0.38,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.85,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.522,
+        0.709
+      ],
+      "asr": [
+        0.282,
+        0.468
+      ],
+      "exposure": [
+        0.291,
+        0.478
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.767,
+        0.907
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-robust, oracle origin": {
+    "block_attack": 0.57,
+    "asr": 0.42,
+    "exposure": 0.43,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.84,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.472,
+        0.663
+      ],
+      "asr": [
+        0.328,
+        0.518
+      ],
+      "exposure": [
+        0.337,
+        0.528
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.756,
+        0.899
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-v2, runtime attribution": {
+    "block_attack": 0.64,
+    "asr": 0.36,
+    "exposure": 0.36,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.92,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.542,
+        0.727
+      ],
+      "asr": [
+        0.273,
+        0.458
+      ],
+      "exposure": [
+        0.273,
+        0.458
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.85,
+        0.959
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "DriftGuard-v2, oracle origin": {
+    "block_attack": 0.64,
+    "asr": 0.36,
+    "exposure": 0.36,
+    "drift_admit": 1.0,
+    "ordinary_admit": 1.0,
+    "drift_util_use": 0.92,
+    "drift_util_withhold": 0.92,
+    "ordinary_util": 1.0,
+    "_ci95": {
+      "block_attack": [
+        0.542,
+        0.727
+      ],
+      "asr": [
+        0.273,
+        0.458
+      ],
+      "exposure": [
+        0.273,
+        0.458
+      ],
+      "drift_admit": [
+        0.963,
+        1.0
+      ],
+      "ordinary_admit": [
+        0.963,
+        1.0
+      ],
+      "drift_util_use": [
+        0.85,
+        0.959
+      ],
+      "drift_util_withhold": [
+        0.85,
+        0.959
+      ],
+      "ordinary_util": [
+        0.963,
+        1.0
+      ]
+    }
+  },
+  "_runtime_attribution_accuracy": {
+    "attack_attributed_untrusted": 0.82,
+    "benign_attributed_user": 0.775
+  },
+  "_setup": {
+    "agent_model": "llama3:latest",
+    "judge_model": "llama3:latest",
+    "n_attack": 100,
+    "n_drift": 100,
+    "n_ordinary": 100
+  }
+}
