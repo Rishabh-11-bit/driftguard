@@ -15,6 +15,7 @@ import typer
 from app.demo_data import PRESETS, SEED_MEMORIES, daily_history
 from driftguard.detector.classifier import DriftGuardClassifier
 from driftguard.detector.features import SemanticFeatureExtractor
+from driftguard.detector.hybrid import HybridDetector
 from driftguard.provenance.schema import make_provenance
 
 app = typer.Typer()
@@ -34,12 +35,13 @@ def expected(name: str) -> int | None:
 @app.command()
 def main(
     models: list[Path] = [Path("models/classifier_hard.pkl"), Path("models/classifier_robust.pkl"),
-                          Path("models/classifier_v2.pkl"), Path("models/classifier_v3.pkl")],
+                          Path("models/classifier_v2.pkl"), Path("models/classifier_v3.pkl"),
+                          Path("models/classifier_hybrid.pkl")],
     out: Path = Path("results_research/presets.json"),
 ) -> None:
     ext = SemanticFeatureExtractor()
     hist = daily_history()
-    dets = {m.stem: DriftGuardClassifier.load(m) for m in models if m.exists()}
+    dets = {m.stem: (HybridDetector if "hybrid" in m.stem else DriftGuardClassifier).load(m) for m in models if m.exists()}
     rows, summary = [], {k: {"correct": 0, "n": 0, "attack_missed": 0, "benign_quarantined": 0} for k in dets}
     for name, vals in PRESETS.items():
         exp = expected(name)
@@ -52,7 +54,10 @@ def main(
         row = {"preset": name, "expected": NAMES[exp]}
         for k, d in dets.items():
             n_feat = len(d._feature_names or []) or 18
-            pred, proba = d.predict_one(x[:n_feat])
+            if getattr(d, "needs_text", False):
+                pred, proba = d.predict_one(x[:n_feat], content=text)
+            else:
+                pred, proba = d.predict_one(x[:n_feat])
             row[k] = NAMES[int(pred)]
             s = summary[k]
             s["n"] += 1

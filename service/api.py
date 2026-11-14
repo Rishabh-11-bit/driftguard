@@ -146,8 +146,8 @@ def create_app(
         if not os.getenv("DRIFTGUARD_MODEL_KEY"):
             raise RuntimeError("DRIFTGUARD_MODEL_KEY is required to load a model in the service "
                                "(plain SHA-256 signatures do not stop an attacker who can write the model directory).")
-        from driftguard.detector.classifier import DriftGuardClassifier
-        classifier = DriftGuardClassifier.load(os.getenv("DRIFTGUARD_MODEL_PATH", "models/classifier_v3.pkl"))
+        from driftguard.detector.hybrid import load_detector
+        classifier = load_detector(os.getenv("DRIFTGUARD_MODEL_PATH", "models/classifier_hybrid.pkl"))
     if extractor is None:
         from driftguard.detector.features import FeatureExtractor, SemanticFeatureExtractor
         n_feat = len(getattr(classifier, "_feature_names", None) or [])

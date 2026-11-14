@@ -259,6 +259,13 @@ class DriftGuardClassifier:
         # Reviewed: `data` already passed signature verification above (HMAC when DRIFTGUARD_MODEL_KEY
         # is set); only allow_unsigned=True skips it and is opt-in for files the caller created.
         state = pickle.loads(data)  # nosec B301
+        obj = cls._from_state(state)
+        logger.info(f"[Classifier] Loaded from {path}.")
+        return obj
+
+    @classmethod
+    def _from_state(cls, state: dict) -> "DriftGuardClassifier":
+        """Rebuild a classifier from the dict written by save() (the state is already integrity-checked)."""
         obj = cls(
             backend=state["backend"],
             n_estimators=state["n_estimators"],
@@ -267,7 +274,6 @@ class DriftGuardClassifier:
         obj._model = state["model"]
         obj._feature_names = state["feature_names"]
         obj._is_fitted = state["is_fitted"]
-        logger.info(f"[Classifier] Loaded from {path}.")
         return obj
 
     # ── helpers ──────────────────────────────────────────────

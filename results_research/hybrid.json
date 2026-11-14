@@ -1,0 +1,252 @@
+{
+  "benchmark test": {
+    "v3": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "tfidf": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "embed": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0125,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "v3+tfidf": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "v3+embed": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "v3+tfidf+embed": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    }
+  },
+  "notes A (seen writer, new goals)": {
+    "v3": {
+      "auroc": 0.8115277777777778,
+      "recall": 0.5,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.48333333333333334,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "tfidf": {
+      "auroc": 0.9055555555555556,
+      "recall": 0.5833333333333334,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.225,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "embed": {
+      "auroc": 0.9179166666666667,
+      "recall": 0.65,
+      "false_alarm": 0.058333333333333334,
+      "far_at_90_recall": 0.15,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "v3+tfidf": {
+      "auroc": 0.9223611111111111,
+      "recall": 0.5166666666666667,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.19166666666666668,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "v3+embed": {
+      "auroc": 0.9052777777777778,
+      "recall": 0.5833333333333334,
+      "false_alarm": 0.058333333333333334,
+      "far_at_90_recall": 0.21666666666666667,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "v3+tfidf+embed": {
+      "auroc": 0.9463888888888888,
+      "recall": 0.6166666666666667,
+      "false_alarm": 0.025,
+      "far_at_90_recall": 0.13333333333333333,
+      "n_attack": 60,
+      "n_benign": 120
+    }
+  },
+  "notes B (unseen writer)": {
+    "v3": {
+      "auroc": 0.8433333333333334,
+      "recall": 0.8333333333333334,
+      "false_alarm": 0.26666666666666666,
+      "far_at_90_recall": 0.36666666666666664,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "tfidf": {
+      "auroc": 0.9472222222222223,
+      "recall": 0.5333333333333333,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.18333333333333332,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "embed": {
+      "auroc": 0.9344444444444445,
+      "recall": 0.8666666666666667,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.13333333333333333,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+tfidf": {
+      "auroc": 0.9238888888888889,
+      "recall": 0.6666666666666666,
+      "false_alarm": 0.1,
+      "far_at_90_recall": 0.18333333333333332,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+embed": {
+      "auroc": 0.9238888888888889,
+      "recall": 0.8333333333333334,
+      "false_alarm": 0.15,
+      "far_at_90_recall": 0.18333333333333332,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+tfidf+embed": {
+      "auroc": 0.9511111111111111,
+      "recall": 0.7666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.11666666666666667,
+      "n_attack": 30,
+      "n_benign": 60
+    }
+  },
+  "notes C (unseen writer + style)": {
+    "v3": {
+      "auroc": 0.9183333333333333,
+      "recall": 0.9666666666666667,
+      "false_alarm": 0.3,
+      "far_at_90_recall": 0.21666666666666667,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "tfidf": {
+      "auroc": 0.9883333333333333,
+      "recall": 0.9666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.03333333333333333,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "embed": {
+      "auroc": 0.9783333333333333,
+      "recall": 0.9333333333333333,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.06666666666666667,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+tfidf": {
+      "auroc": 0.9994444444444444,
+      "recall": 1.0,
+      "false_alarm": 0.11666666666666667,
+      "far_at_90_recall": 0.0,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+embed": {
+      "auroc": 0.981111111111111,
+      "recall": 0.9666666666666667,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.06666666666666667,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "v3+tfidf+embed": {
+      "auroc": 0.9944444444444445,
+      "recall": 1.0,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.016666666666666666,
+      "n_attack": 30,
+      "n_benign": 60
+    }
+  },
+  "real text, length-matched, unseen": {
+    "v3": {
+      "auroc": 0.8641703377386196,
+      "recall": 0.4523809523809524,
+      "false_alarm": 0.039647577092511016,
+      "far_at_90_recall": 0.3656387665198238,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "tfidf": {
+      "auroc": 0.982553667575694,
+      "recall": 0.8968253968253969,
+      "false_alarm": 0.00881057268722467,
+      "far_at_90_recall": 0.00881057268722467,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "embed": {
+      "auroc": 0.9761555136004475,
+      "recall": 0.8333333333333334,
+      "false_alarm": 0.01762114537444934,
+      "far_at_90_recall": 0.030837004405286344,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "v3+tfidf": {
+      "auroc": 0.9825536675756938,
+      "recall": 0.746031746031746,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.013215859030837005,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "v3+embed": {
+      "auroc": 0.9602824977274316,
+      "recall": 0.7142857142857143,
+      "false_alarm": 0.013215859030837005,
+      "far_at_90_recall": 0.05286343612334802,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "v3+tfidf+embed": {
+      "auroc": 0.9874484301797078,
+      "recall": 0.8253968253968254,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.004405286343612335,
+      "n_attack": 126,
+      "n_benign": 227
+    }
+  }
+}

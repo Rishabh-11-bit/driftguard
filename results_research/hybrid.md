@@ -1,0 +1,32 @@
+| Test set | Scorer | AUROC | Recall @0.5 | False alarm @0.5 | False alarm at 90 % recall |
+|---|---|---|---|---|---|
+| benchmark test (n=40+80) | v3 | 1.000 | 1.00 | 0.00 | 0.00 |
+| benchmark test (n=40+80) | tfidf | 1.000 | 1.00 | 0.00 | 0.00 |
+| benchmark test (n=40+80) | embed | 1.000 | 1.00 | 0.01 | 0.00 |
+| benchmark test (n=40+80) | v3+tfidf | 1.000 | 1.00 | 0.00 | 0.00 |
+| benchmark test (n=40+80) | v3+embed | 1.000 | 1.00 | 0.00 | 0.00 |
+| benchmark test (n=40+80) | v3+tfidf+embed | 1.000 | 1.00 | 0.00 | 0.00 |
+| notes A (seen writer, new goals) (n=60+120) | v3 | 0.812 | 0.50 | 0.08 | 0.48 |
+| notes A (seen writer, new goals) (n=60+120) | tfidf | 0.906 | 0.58 | 0.03 | 0.23 |
+| notes A (seen writer, new goals) (n=60+120) | embed | 0.918 | 0.65 | 0.06 | 0.15 |
+| notes A (seen writer, new goals) (n=60+120) | v3+tfidf | 0.922 | 0.52 | 0.05 | 0.19 |
+| notes A (seen writer, new goals) (n=60+120) | v3+embed | 0.905 | 0.58 | 0.06 | 0.22 |
+| notes A (seen writer, new goals) (n=60+120) | v3+tfidf+embed | 0.946 | 0.62 | 0.03 | 0.13 |
+| notes B (unseen writer) (n=30+60) | v3 | 0.843 | 0.83 | 0.27 | 0.37 |
+| notes B (unseen writer) (n=30+60) | tfidf | 0.947 | 0.53 | 0.00 | 0.18 |
+| notes B (unseen writer) (n=30+60) | embed | 0.934 | 0.87 | 0.05 | 0.13 |
+| notes B (unseen writer) (n=30+60) | v3+tfidf | 0.924 | 0.67 | 0.10 | 0.18 |
+| notes B (unseen writer) (n=30+60) | v3+embed | 0.924 | 0.83 | 0.15 | 0.18 |
+| notes B (unseen writer) (n=30+60) | v3+tfidf+embed | 0.951 | 0.77 | 0.03 | 0.12 |
+| notes C (unseen writer + style) (n=30+60) | v3 | 0.918 | 0.97 | 0.30 | 0.22 |
+| notes C (unseen writer + style) (n=30+60) | tfidf | 0.988 | 0.97 | 0.03 | 0.03 |
+| notes C (unseen writer + style) (n=30+60) | embed | 0.978 | 0.93 | 0.08 | 0.07 |
+| notes C (unseen writer + style) (n=30+60) | v3+tfidf | 0.999 | 1.00 | 0.12 | 0.00 |
+| notes C (unseen writer + style) (n=30+60) | v3+embed | 0.981 | 0.97 | 0.08 | 0.07 |
+| notes C (unseen writer + style) (n=30+60) | v3+tfidf+embed | 0.994 | 1.00 | 0.08 | 0.02 |
+| real text, length-matched, unseen (n=126+227) | v3 | 0.864 | 0.45 | 0.04 | 0.37 |
+| real text, length-matched, unseen (n=126+227) | tfidf | 0.983 | 0.90 | 0.01 | 0.01 |
+| real text, length-matched, unseen (n=126+227) | embed | 0.976 | 0.83 | 0.02 | 0.03 |
+| real text, length-matched, unseen (n=126+227) | v3+tfidf | 0.983 | 0.75 | 0.00 | 0.01 |
+| real text, length-matched, unseen (n=126+227) | v3+embed | 0.960 | 0.71 | 0.01 | 0.05 |
+| real text, length-matched, unseen (n=126+227) | v3+tfidf+embed | 0.987 | 0.83 | 0.00 | 0.00 |

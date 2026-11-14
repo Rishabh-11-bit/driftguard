@@ -41,7 +41,8 @@ st.set_page_config(page_title="DriftGuard", page_icon="🛡️", layout="wide")
 CLASS_NAMES = ["Malicious", "Benign drift", "Ordinary learning"]
 CLASS_COLORS = ["#ef4444", "#f59e0b", "#22c55e"]
 MODELS = {
-    "v3: v2 + LLM-written notes (recommended; run scripts.generate_notes + train_v3)": ROOT / "models" / "classifier_v3.pkl",
+    "Hybrid: v3 + text classifiers (recommended; run scripts.train_hybrid)": ROOT / "models" / "classifier_hybrid.pkl",
+    "v3: v2 + LLM-written notes": ROOT / "models" / "classifier_v3.pkl",
     "v2: semantic + robust + real text": ROOT / "models" / "classifier_v2.pkl",
     "Hardened model": ROOT / "models" / "classifier_hard.pkl",
     "Raw-benchmark model": ROOT / "models" / "classifier.pkl",
@@ -91,8 +92,9 @@ class ListMemory:
 
 
 @st.cache_resource(show_spinner="Loading detector…")
-def load_model(path: str) -> DriftGuardClassifier:
-    return DriftGuardClassifier.load(path)
+def load_model(path: str):
+    from driftguard.detector.hybrid import load_detector     # handles both classifier and hybrid files
+    return load_detector(path)
 
 
 @st.cache_resource(show_spinner="Warming up the embedding model (first run only)…")

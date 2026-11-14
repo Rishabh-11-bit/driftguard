@@ -27,15 +27,14 @@ write-time architecture, the label-leak finding, the evaluation methodology, and
 * CI: Python 3.11/3.12 matrix, read-only permissions, `bandit` finding annotated and reviewed. Last two CI runs passed.
 * `pyproject.toml`: pytest moved to `dev`, streamlit/plotly to a new `app` extra.
 * New scripts: `run_stats`, `run_stealth_v2`, `run_real_text_controlled`, `generate_notes`, `train_v3`, `make_manifest`.
-* New models (git-ignored): `models/classifier_v3.pkl` (+ `.sig`). v2 is still the default in the UI and service; v3 is better on every held-out set I measured, switch when you have checked it on the demo presets.
+* New models (git-ignored): `models/classifier_v3.pkl` and `models/classifier_hybrid.pkl` (+ `.sig`). **The hybrid is now the default** in the UI and the Guard API (see the second-pass update below).
 
 ## Still open (needs a human or more time)
 1. **Licence / IP**: no LICENSE file; decide who owns the code (MIT-WPU or the team).
-2. **Related work**: the paper has no sourced survey, and its reference list is unverified.
-3. **Report and slide deck**: still quote the old pre-fix numbers.
+2. ~~Related work~~ done in the second pass (11 verified references); a head-to-head comparison with A-MemGuard is still missing.
+3. ~~Report~~ an updated copy with a correction notice and Section 16 is on your Desktop (`DriftGuard_Project_Report_v2.docx` / `.pdf`); the midterm deck is a historical artefact and was left alone.
 4. **Detector quality**: the strongest next step is more diverse, human-written or multi-model note data and a proper comparison against a fine-tuned text classifier; a TF-IDF model currently matches v3.
-5. **Not done**: wheel still ships `eval`/`scripts`/`app` as top-level packages; GitHub Actions pinned by tag, not SHA; `pip-audit` is advisory; models are still pickles (HMAC-signed); `SECURITY.md` lists the remaining open security items.
-6. v3 was not run through the Streamlit presets; the earlier v2 mislabelled two drift presets as ordinary.
+5. **Not done**: `pip-audit` is advisory (the dependency tree carries torch/transformers advisories that do not apply to the service); models are still pickles (HMAC-signed); `SECURITY.md` lists the remaining open security items.
 
 ## Caveats you should repeat if you present this
 * Every benchmark number is on data we generated. LLM-written test sets are small (90-180 notes) and written by small local models.
@@ -43,3 +42,11 @@ write-time architecture, the label-leak finding, the evaluation methodology, and
 * The semantic anchors were written by us after seeing the attack goals.
 
 Reproduce everything with the commands in section 9 of the paper; `results_research/manifest.json` records the commit, library versions, data hashes and Ollama model digests.
+
+## Second-pass update
+* **Related work**: sourced section and 11 references checked against arXiv/venue pages (paper section 7). Includes A-MemGuard and two 2026 preprints on write-time provenance tagging / forged-reasoning attacks that we have only read at abstract level and have **not** compared against.
+* **Hybrid detector (new default)**: averaging P(malicious) of v3, a TF-IDF LR and an embedding LR is the best or within 0.005 AUROC of the best scorer on every held-out text set (AUROC 0.95-0.99; false alarms at 90 % recall 0.00-0.13 vs 0.22-0.48 for v3). Shipped as `driftguard/detector/hybrid.py` (signed pickle, loaded through the same integrity check), wired through `WritePipeline`, the forensic audit, the Guard API and the UI. Caveat in the paper: text-only numbers on real text are inflated by a dataset-vocabulary gap, and these sets cannot show the value of provenance.
+* **Presets**: all 11 demo presets are classified correctly by hard, robust, v2, v3 and the hybrid (`python -m scripts.check_presets`). My earlier note that v2 mislabelled two drift presets no longer holds.
+* **Packaging / CI**: wheel ships only `driftguard` and `service` (CLI entry points removed; research scripts run with `python -m scripts.<name>` from a checkout); GitHub Actions pinned to commit SHAs.
+* **Report**: `DriftGuard_Project_Report_v2.docx/.pdf` (Desktop): the original, with a correction notice at the top of Sections 1 and 9.2 and a new Section 16 (revised results, what the audit found, hardening). The original files are unchanged.
+* **Deliberately not done**: adding a LICENSE file (choosing a licence and copyright holder is a legal/ownership decision for you, the team and MIT-WPU), editing the midterm deck, and claiming novelty over the 2026 preprints.

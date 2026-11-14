@@ -163,7 +163,10 @@ class ForensicAuditor:
             write_history=[],  # historical context not available at audit time
             session_id=prov.session_id,
         )
-        new_class_int, probas = self.classifier.predict_one(features)
+        if getattr(self.classifier, "needs_text", False):
+            new_class_int, probas = self.classifier.predict_one(features, content=entry_text)
+        else:
+            new_class_int, probas = self.classifier.predict_one(features)
         new_class_name = CLASS_NAMES[new_class_int]
 
         if new_class_name == original_class:

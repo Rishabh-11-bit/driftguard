@@ -220,7 +220,10 @@ class WritePipeline:
                 user_memory_entries=self._existing_memory_texts(),
             )
             self.last_features = features
-            pred, proba = self.classifier.predict_one(features)
+            if getattr(self.classifier, "needs_text", False):      # hybrid detector also scores the text itself
+                pred, proba = self.classifier.predict_one(features, content=candidate.content)
+            else:
+                pred, proba = self.classifier.predict_one(features)
             return int(pred), proba.tolist()
         except Exception as exc:
             if self.fail_closed:
