@@ -41,7 +41,8 @@ st.set_page_config(page_title="DriftGuard", page_icon="🛡️", layout="wide")
 CLASS_NAMES = ["Malicious", "Benign drift", "Ordinary learning"]
 CLASS_COLORS = ["#ef4444", "#f59e0b", "#22c55e"]
 MODELS = {
-    "v2: semantic + robust + real text (recommended)": ROOT / "models" / "classifier_v2.pkl",
+    "v3: v2 + LLM-written notes (recommended; run scripts.generate_notes + train_v3)": ROOT / "models" / "classifier_v3.pkl",
+    "v2: semantic + robust + real text": ROOT / "models" / "classifier_v2.pkl",
     "Hardened model": ROOT / "models" / "classifier_hard.pkl",
     "Raw-benchmark model": ROOT / "models" / "classifier.pkl",
 }

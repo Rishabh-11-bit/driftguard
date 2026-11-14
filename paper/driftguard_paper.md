@@ -231,7 +231,13 @@ Fixed: unsigned pickle loading (code execution; regression test with a real mali
 
 ## 7. Related work
 
-Memory/knowledge-base poisoning: MINJA [1], AgentPoison [2]; indirect prompt injection [3]; dataset artefacts and shortcut learning [4]. Input-level guardrails address single messages rather than persistent state. *A sourced survey is still to be written; we make no novelty claim against specific systems until it is.*
+**Attacks on agent memory and knowledge bases.** MINJA [1] injects malicious records into an agent's memory using only ordinary queries and output observations, with no privileged access; AgentPoison [2] plants a few poisoned demonstrations in memory or a RAG knowledge base that are retrieved when a trigger appears in the query; PoisonedRAG [4] corrupts a retrieval corpus with a handful of crafted passages. Our two benchmark attack families are modelled on [1] and [2]; we did not run their original attack code, so our attacks are *style-level* imitations, which is a limitation.
+
+**Indirect prompt injection and its defences.** Greshake et al. [3] introduced indirect prompt injection and a security taxonomy; AgentDojo [5] provides a dynamic evaluation environment for agents that call tools over untrusted data. Defences operate mostly at inference time on a single request: the instruction hierarchy [6] trains models to rank system over user over third-party instructions, and spotlighting [7] marks the source of untrusted text in the prompt. CaMeL [8] is the closest in spirit to our provenance argument: it tracks the provenance of values through a custom interpreter and enforces capability policies, giving provable guarantees on a fraction of AgentDojo tasks, but it constrains how the agent is built rather than classifying what it stores. These approaches protect the *current* turn; none targets the *persistent write* that poisons later sessions, which is the point of our write-time formulation.
+
+**Defences specific to agent memory.** A-MemGuard [9] defends memory with consensus-based validation (comparing reasoning paths derived from several related memories) and a dual-memory structure that stores detected failures as lessons. It acts at *use* time on the reasoning the memories induce, whereas DriftGuard acts at *write* time on the candidate entry, and DriftGuard additionally models benign personalisation drift as a separate class so that legitimate preference changes are admitted (flagged) rather than blocked. Concurrent preprints discuss forged-reasoning attacks that target consensus defences (arXiv:2607.05029, "Your Agent's Memories Are Not Its Own") and write-time HMAC provenance tagging (arXiv:2606.12703; we have not verified its title). We have read only their abstracts and **have not compared against any of these systems**; a head-to-head comparison with A-MemGuard in particular is the most important missing baseline. We therefore make no novelty claim beyond the combination of a three-class write-time detector, runtime provenance attribution, and the evaluation methodology, and we regard the closeness of the 2026 preprints as a reason to position this paper as a methodology and negative-results contribution.
+
+**Evaluation methodology.** Shortcut learning [10] describes models that exploit dataset artefacts instead of the intended signal; our label-leak and length-confound findings are instances in a security setting. For model comparison under repeated cross-validation we use the corrected resampled t-test of Nadeau and Bengio [11].
 
 ## 8. Limitations
 
@@ -273,10 +279,18 @@ Generation seeds are fixed, but LLM-written text and agent behaviour depend on t
 
 Real memory-poisoning traces with provenance from design partners; taint tracking inside the model runtime rather than lexical grounding; retrieval-time filtering as a second layer; attacks authored by people who have not seen the detector; a user study of review burden.
 
-## References (verify before submission)
+## References
 
-[1] Dong et al., "A Practical Memory Injection Attack against LLM Agents" (MINJA), 2025.
-[2] Chen et al., "AgentPoison: Red-teaming LLM Agents via Poisoning Memory or Knowledge Bases", NeurIPS 2024.
-[3] Greshake et al., "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection", 2023.
-[4] Geirhos et al., "Shortcut Learning in Deep Neural Networks", Nature Machine Intelligence, 2020.
-[5] OWASP, "Top 10 for LLM Applications".
+All entries below were checked against the arXiv listing or the venue's page in this session. Venue details are as reported by those pages.
+
+[1] S. Dong, S. Xu, P. He, Y. Li, J. Tang, T. Liu, H. Liu, Z. Xiang. "Memory Injection Attacks on LLM Agents via Query-Only Interaction" (MINJA; earlier title "A Practical Memory Injection Attack against LLM Agents"). arXiv:2503.03704; NeurIPS 2025.
+[2] Z. Chen, Z. Xiang, C. Xiao, D. Song, B. Li. "AgentPoison: Red-teaming LLM Agents via Poisoning Memory or Knowledge Bases". arXiv:2407.12784; NeurIPS 2024.
+[3] K. Greshake, S. Abdelnabi, S. Mishra, C. Endres, T. Holz, M. Fritz. "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection". arXiv:2302.12173, 2023.
+[4] W. Zou, R. Geng, B. Wang, J. Jia. "PoisonedRAG: Knowledge Corruption Attacks to Retrieval-Augmented Generation of Large Language Models". arXiv:2402.07867; USENIX Security 2025.
+[5] E. Debenedetti, J. Zhang, M. Balunovic, L. Beurer-Kellner, M. Fischer, F. Tramer. "AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents". arXiv:2406.13352; NeurIPS 2024 Datasets and Benchmarks.
+[6] E. Wallace, K. Xiao, R. Leike, L. Weng, J. Heidecke, A. Beutel. "The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions". arXiv:2404.13208, 2024.
+[7] K. Hines, G. Lopez, M. Hall, F. Zarfati, Y. Zunger, E. Kiciman. "Defending Against Indirect Prompt Injection Attacks With Spotlighting". arXiv:2403.14720, 2024.
+[8] E. Debenedetti et al. "Defeating Prompt Injections by Design" (CaMeL). arXiv:2503.18813, 2025.
+[9] Q. Wei et al. "A-MemGuard: A Proactive Defense Framework for LLM-Based Agent Memory". arXiv:2510.02373, 2025 (author list and exact title as shown on the arXiv listing; check before submission).
+[10] R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. Zemel, W. Brendel, M. Bethge, F. A. Wichmann. "Shortcut Learning in Deep Neural Networks". arXiv:2004.07780 (Nature Machine Intelligence, 2020; journal page not checked).
+[11] C. Nadeau, Y. Bengio. "Inference for the Generalization Error". Machine Learning 52, 239-281, 2003 (verified via secondary sources only).

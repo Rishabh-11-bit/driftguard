@@ -72,14 +72,10 @@ dev = [
     "mypy",
 ]
 
-[project.scripts]
-driftguard-demo    = "scripts.demo_agent:app"
-driftguard-bench   = "scripts.generate_benchmark:app"
-driftguard-train   = "scripts.train_detector:app"
-driftguard-eval    = "scripts.run_eval:app"
-
 [tool.hatch.build.targets.wheel]
-packages = ["driftguard", "eval", "scripts", "service", "app"]
+# Only the library and the service ship. eval/, scripts/ and app/ are research code run from a checkout
+# (python -m scripts.<name>); installing them as top-level packages would collide with other projects.
+packages = ["driftguard", "service"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
