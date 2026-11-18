@@ -103,10 +103,36 @@
       "n_benign": 60
     }
   },
+  "notes D (hand-style, 100 notes, 18 benign instruction-like)": {
+    "hybrid": {
+      "auroc": 0.892,
+      "recall": 0.96,
+      "false_alarm": 0.38,
+      "far_at_90_recall": 0.3,
+      "n_attack": 50,
+      "n_benign": 50
+    },
+    "finetuned": {
+      "auroc": 0.8952,
+      "recall": 0.98,
+      "false_alarm": 0.42,
+      "far_at_90_recall": 0.28,
+      "n_attack": 50,
+      "n_benign": 50
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.8952,
+      "recall": 0.98,
+      "false_alarm": 0.42,
+      "far_at_90_recall": 0.3,
+      "n_attack": 50,
+      "n_benign": 50
+    }
+  },
   "real text, length-matched, unseen": {
     "hybrid": {
-      "auroc": 0.9874484301797078,
-      "recall": 0.8253968253968254,
+      "auroc": 0.9879728690301378,
+      "recall": 0.8333333333333334,
       "false_alarm": 0.0,
       "far_at_90_recall": 0.004405286343612335,
       "n_attack": 126,
@@ -121,7 +147,7 @@
       "n_benign": 227
     },
     "hybrid+finetuned": {
-      "auroc": 0.9976225438780505,
+      "auroc": 0.9978323194182226,
       "recall": 0.8888888888888888,
       "false_alarm": 0.0,
       "far_at_90_recall": 0.0,

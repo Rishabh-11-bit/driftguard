@@ -63,6 +63,7 @@ def main(
     benchmark: Path = Path("data/benchmark_hard.jsonl"),
     ext_dir: Path = Path("data/external"),
     notes: Path = Path("data/llm_notes.jsonl"),
+    hand: Path = Path("data/hand_notes.tsv"),
     hybrid: Path = Path("models/classifier_hybrid.pkl"),
     out: Path = Path("results_research"),
     epochs: int = 3,
@@ -101,6 +102,8 @@ def main(
             total += float(loss) * len(ids)
         print(f"epoch {ep + 1}: train loss {total / len(texts):.4f}", flush=True)
 
+    Path("models").mkdir(exist_ok=True)
+    torch.save(model.state_dict(), "models/finetuned_minilm.pt")   # git-ignored; avoids retraining next time
     ext = SemanticFeatureExtractor()
     det = load_detector(hybrid)
     n_feat = len(det._feature_names)
@@ -124,6 +127,12 @@ def main(
         rs = [r for r in rows if r["split"] == split]
         texts = [r["text"] for r in rs]
         sets[label] = (texts, ext.extract_batch(ctx(texts)), np.array([int(r["label"] == 0) for r in rs]))
+
+    if hand.exists():       # set D: 100 notes written by hand-style prompting of a different model (label<TAB>text)
+        pairs = [ln.split("\t", 1) for ln in hand.read_text(encoding="utf-8").splitlines() if "\t" in ln]
+        texts = [t for _, t in pairs]
+        sets["notes D (hand-style, 100 notes, 18 benign instruction-like)"] = (
+            texts, ext.extract_batch(ctx(texts)), np.array([int(lab == "0") for lab, _ in pairs]))
 
     a_raw, b_raw = load_real(ext_dir, 100000, random.Random(0))
     atk = [t for t in dedupe(sorted({_fmt(t) for t in a_raw})) if len(t) > 26]

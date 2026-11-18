@@ -12,6 +12,9 @@
 | notes C (unseen writer + style) (n=30+60) | hybrid | 0.994 | 1.00 | 0.08 | 0.02 |
 | notes C (unseen writer + style) (n=30+60) | finetuned | 0.995 | 0.97 | 0.03 | 0.02 |
 | notes C (unseen writer + style) (n=30+60) | hybrid+finetuned | 0.996 | 0.97 | 0.03 | 0.02 |
-| real text, length-matched, unseen (n=126+227) | hybrid | 0.987 | 0.83 | 0.00 | 0.00 |
+| notes D (hand-style, 100 notes, 18 benign instruction-like) (n=50+50) | hybrid | 0.892 | 0.96 | 0.38 | 0.30 |
+| notes D (hand-style, 100 notes, 18 benign instruction-like) (n=50+50) | finetuned | 0.895 | 0.98 | 0.42 | 0.28 |
+| notes D (hand-style, 100 notes, 18 benign instruction-like) (n=50+50) | hybrid+finetuned | 0.895 | 0.98 | 0.42 | 0.30 |
+| real text, length-matched, unseen (n=126+227) | hybrid | 0.988 | 0.83 | 0.00 | 0.00 |
 | real text, length-matched, unseen (n=126+227) | finetuned | 1.000 | 0.90 | 0.00 | 0.00 |
 | real text, length-matched, unseen (n=126+227) | hybrid+finetuned | 0.998 | 0.89 | 0.00 | 0.00 |
