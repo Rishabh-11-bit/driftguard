@@ -1,0 +1,158 @@
+{
+  "benchmark test": {
+    "hybrid": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "finetuned": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    },
+    "hybrid+finetuned": {
+      "auroc": 1.0,
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 40,
+      "n_benign": 80
+    }
+  },
+  "notes A (seen writer, new goals)": {
+    "hybrid": {
+      "auroc": 0.9481944444444443,
+      "recall": 0.5666666666666667,
+      "false_alarm": 0.016666666666666666,
+      "far_at_90_recall": 0.11666666666666667,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "finetuned": {
+      "auroc": 0.9408333333333334,
+      "recall": 0.8,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.23333333333333334,
+      "n_attack": 60,
+      "n_benign": 120
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.9604166666666667,
+      "recall": 0.8,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.10833333333333334,
+      "n_attack": 60,
+      "n_benign": 120
+    }
+  },
+  "notes B (unseen writer)": {
+    "hybrid": {
+      "auroc": 0.9527777777777778,
+      "recall": 0.8,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.1,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "finetuned": {
+      "auroc": 0.99,
+      "recall": 0.9,
+      "false_alarm": 0.016666666666666666,
+      "far_at_90_recall": 0.016666666666666666,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.9788888888888889,
+      "recall": 0.9,
+      "false_alarm": 0.016666666666666666,
+      "far_at_90_recall": 0.0,
+      "n_attack": 30,
+      "n_benign": 60
+    }
+  },
+  "notes C (unseen writer + style)": {
+    "hybrid": {
+      "auroc": 0.9966666666666666,
+      "recall": 1.0,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.0,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "finetuned": {
+      "auroc": 0.9966666666666666,
+      "recall": 1.0,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.016666666666666666,
+      "n_attack": 30,
+      "n_benign": 60
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.9988888888888888,
+      "recall": 1.0,
+      "false_alarm": 0.016666666666666666,
+      "far_at_90_recall": 0.0,
+      "n_attack": 30,
+      "n_benign": 60
+    }
+  },
+  "notes D (hand-style, 100 notes, 18 benign instruction-like)": {
+    "hybrid": {
+      "auroc": 0.9516,
+      "recall": 0.96,
+      "false_alarm": 0.3,
+      "far_at_90_recall": 0.14,
+      "n_attack": 50,
+      "n_benign": 50
+    },
+    "finetuned": {
+      "auroc": 0.9843999999999999,
+      "recall": 0.9,
+      "false_alarm": 0.04,
+      "far_at_90_recall": 0.02,
+      "n_attack": 50,
+      "n_benign": 50
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.9776,
+      "recall": 0.9,
+      "false_alarm": 0.08,
+      "far_at_90_recall": 0.02,
+      "n_attack": 50,
+      "n_benign": 50
+    }
+  },
+  "real text, length-matched, unseen": {
+    "hybrid": {
+      "auroc": 0.9851059366477869,
+      "recall": 0.8333333333333334,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.00881057268722467,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "finetuned": {
+      "auroc": 0.9978323194182225,
+      "recall": 0.9365079365079365,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 126,
+      "n_benign": 227
+    },
+    "hybrid+finetuned": {
+      "auroc": 0.996084189916789,
+      "recall": 0.9206349206349206,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0,
+      "n_attack": 126,
+      "n_benign": 227
+    }
+  }
+}

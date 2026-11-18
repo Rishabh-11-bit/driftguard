@@ -35,6 +35,7 @@ def main(
     base_path: Path = Path("models/classifier_v3.pkl"),
     out: Path = Path("models/classifier_hybrid.pkl"),
     seed: int = 42,
+    extra: Path | None = typer.Option(None, help="optional label<TAB>text file of extra training notes (text models only)"),
 ) -> None:
     entries = load_benchmark(benchmark)
     y_all = np.array([e.label_int for e in entries])
@@ -46,6 +47,10 @@ def main(
 
     texts = [entries[i].content for i in tr] + atk[:h] + ben[:h] + [r["text"] for r in train_notes]
     y = np.array([int(y_all[i] == 0) for i in tr] + [1] * h + [0] * h + [int(r["label"] == 0) for r in train_notes])
+    if extra is not None:   # label 0 = attack; 1/2 = not attack
+        pairs = [ln.split("\t", 1) for ln in extra.read_text(encoding="utf-8").splitlines() if "\t" in ln]
+        texts += [t for _, t in pairs]
+        y = np.concatenate([y, np.array([int(lab == "0") for lab, _ in pairs])])
     print(f"text-model training rows: {len(texts)} ({int(y.sum())} attack)", flush=True)
 
     tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=2, sublinear_tf=True)

@@ -22,4 +22,6 @@ results/*.png
 pptx_work/
 models/*.sig
 data/external/
+data/external2/
+models/*.pt
 results_smoke/

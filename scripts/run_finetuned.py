@@ -68,6 +68,8 @@ def main(
     out: Path = Path("results_research"),
     epochs: int = 3,
     seed: int = 42,
+    extra: Path | None = typer.Option(None, help="optional label<TAB>text file of extra training notes"),
+    tag: str = typer.Option("", help="suffix for the output files, e.g. _instr"),
 ) -> None:
     torch.manual_seed(seed)
     entries = load_benchmark(benchmark)
@@ -80,6 +82,10 @@ def main(
     tr_texts = [entries[i].content for i in tr] + atk42[:h] + ben42[:h] + [r["text"] for r in train_notes]
     tr_y = np.array([int(y_all[i] == 0) for i in tr] + [1] * h + [0] * h + [int(r["label"] == 0) for r in train_notes],
                     dtype=np.float32)
+    if extra is not None:
+        pairs = [ln.split("\t", 1) for ln in extra.read_text(encoding="utf-8").splitlines() if "\t" in ln]
+        tr_texts += [t for _, t in pairs]
+        tr_y = np.concatenate([tr_y, np.array([int(lab == "0") for lab, _ in pairs], dtype=np.float32)])
     print(f"fine-tuning on {len(tr_texts)} rows ({int(tr_y.sum())} attack), {epochs} epochs", flush=True)
 
     tok = AutoTokenizer.from_pretrained(NAME)
@@ -103,7 +109,7 @@ def main(
         print(f"epoch {ep + 1}: train loss {total / len(texts):.4f}", flush=True)
 
     Path("models").mkdir(exist_ok=True)
-    torch.save(model.state_dict(), "models/finetuned_minilm.pt")   # git-ignored; avoids retraining next time
+    torch.save(model.state_dict(), f"models/finetuned_minilm{tag}.pt")   # git-ignored; avoids retraining next time
     ext = SemanticFeatureExtractor()
     det = load_detector(hybrid)
     n_feat = len(det._feature_names)
@@ -159,7 +165,7 @@ def main(
         print(name, {c: round(result[name][c]["auroc"], 3) for c in COMBOS}, flush=True)
 
     out.mkdir(exist_ok=True)
-    (out / "finetuned.json").write_text(json.dumps(result, indent=2))
+    (out / f"finetuned{tag}.json").write_text(json.dumps(result, indent=2))
     lines = ["| Test set | Scorer | AUROC | Recall @0.5 | False alarm @0.5 | False alarm at 90 % recall |",
              "|---|---|---|---|---|---|"]
     for name, res in result.items():
@@ -167,7 +173,7 @@ def main(
             m = res[c]
             lines.append(f"| {name} (n={m['n_attack']}+{m['n_benign']}) | {c} | {m['auroc']:.3f} | {m['recall']:.2f} | "
                          f"{m['false_alarm']:.2f} | {m['far_at_90_recall']:.2f} |")
-    (out / "finetuned.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / f"finetuned{tag}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
