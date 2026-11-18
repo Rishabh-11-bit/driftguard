@@ -16,11 +16,31 @@ like every other model, and loaded through the same signature check.
 from __future__ import annotations
 
 import pickle
+import re
 from pathlib import Path
 
 import numpy as np
 
 _ENCODERS: dict[str, object] = {}
+
+
+_SENT = re.compile(r"(?<=[.!?;:])\s+|\n+")
+MAX_WINDOWS = 12
+
+
+def windows(text: str, max_windows: int = MAX_WINDOWS) -> list[str]:
+    """The whole note plus its sentences and adjacent sentence pairs (capped, so cost stays bounded)."""
+    parts = [s.strip() for s in _SENT.split(text) if s and s.strip()]
+    if len(parts) <= 1:
+        return [text]
+    cand = parts + [f"{a} {b}" for a, b in zip(parts, parts[1:])]
+    # keep the whole text first, then sentences, then pairs; drop duplicates and cap the total
+    seen, out = set(), []
+    for w in [text] + cand:
+        if w not in seen:
+            seen.add(w)
+            out.append(w)
+    return out[:max_windows]
 
 
 def _encoder(name: str):
@@ -46,10 +66,23 @@ class HybridDetector:
     def _is_fitted(self) -> bool:
         return self.base._is_fitted
 
+    windowed = True     # class attribute: models pickled before windowing existed pick this up too
+
     def _text_scores(self, texts: list[str]) -> tuple[np.ndarray, np.ndarray]:
-        p_tfidf = self.lr_tfidf.predict_proba(self.tfidf.transform(texts))[:, 1]
-        emb = _encoder(self.encoder_name).encode(texts, normalize_embeddings=True, show_progress_bar=False)
-        return p_tfidf, self.lr_embed.predict_proba(emb)[:, 1]
+        """Text-model P(attack) per note. With windowing, each note is scored whole AND per sentence window, and the
+        maximum is taken, so an attack clause buried in benign sentences cannot be diluted below the threshold."""
+        texts = list(texts)
+        groups = [windows(t) if self.windowed else [t] for t in texts]
+        flat = [w for g in groups for w in g]
+        p_tfidf = self.lr_tfidf.predict_proba(self.tfidf.transform(flat))[:, 1]
+        emb = _encoder(self.encoder_name).encode(flat, normalize_embeddings=True, show_progress_bar=False)
+        p_embed = self.lr_embed.predict_proba(emb)[:, 1]
+        out_t, out_e, i = [], [], 0
+        for g in groups:
+            out_t.append(p_tfidf[i:i + len(g)].max())
+            out_e.append(p_embed[i:i + len(g)].max())
+            i += len(g)
+        return np.array(out_t), np.array(out_e)
 
     def predict_proba_text(self, X: np.ndarray, texts: list[str]) -> np.ndarray:
         """Fused 3-class probabilities for a batch: feature rows X and the matching write texts."""

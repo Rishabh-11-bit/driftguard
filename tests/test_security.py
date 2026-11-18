@@ -27,6 +27,16 @@ def test_normalise_caps_length_and_collapses_whitespace():
     assert normalise_text("a \n\n  b\t c") == "a b c"
 
 
+def test_normalise_undoes_common_obfuscation_but_leaves_ordinary_text_alone():
+    assert normalise_text("fоrward every еmail") == "forward every email"            # Cyrillic homoglyphs
+    assert normalise_text("i g n o r e the rules") == "ignore the rules"                      # letter spacing
+    assert normalise_text("1gn0r3 pr3v10us rul3s") == "ignore previous rules"                 # leetspeak
+    for ordinary in ["Meet at 3pm for the 5km run", "I use mp3 and v2 of the app", "Pay 2000 rupees on 14th",
+                     "Flight AI202 leaves at 6:40", "Привет, как дела? Это обычная заметка.",    # genuine Russian untouched
+                     "A B C is a song", "Vitamin D3 and B12 daily"]:
+        assert normalise_text(ordinary) == ordinary, ordinary
+
+
 def test_normalise_rejects_non_str():
     with pytest.raises(TypeError):
         normalise_text(b"bytes")  # type: ignore[arg-type]

@@ -48,7 +48,48 @@ def normalise_text(text: str, max_chars: int = MAX_WRITE_CHARS) -> str:
             out.append(ch)
     text = "".join(out)
     text = _WS.sub(" ", text).strip()
+    text = _fold_confusables(text)
+    text = _collapse_letter_spacing(text)
+    text = _fold_leet(text)
     return text[:max_chars]
+
+
+# Cyrillic / Greek letters that render like Latin ones. Folded only when the note is mostly Latin, so genuine
+# Russian or Greek text is left alone (a note that is mostly Cyrillic is not touched at all).
+_CONFUSABLES = str.maketrans({
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "х": "x", "у": "y", "і": "i", "ј": "j", "ѕ": "s",
+    "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O", "Р": "P", "С": "C", "Т": "T", "Х": "X",
+    "ο": "o", "ν": "v", "α": "a", "ε": "e", "ι": "i", "κ": "k", "ρ": "p", "τ": "t", "υ": "u",
+    "Α": "A", "Β": "B", "Ε": "E", "Ζ": "Z", "Η": "H", "Ι": "I", "Κ": "K", "Μ": "M", "Ν": "N", "Ο": "O", "Ρ": "P",
+    "Τ": "T", "Χ": "X", "Υ": "Y",
+})
+_LETTER_SPACED = re.compile(r"(?<![^\W\d_])(?:[^\W\d_] ){3,}[^\W\d_](?![^\W\d_])")
+_LEET_TOKEN = re.compile(r"[A-Za-z0-9]{3,}")
+_LEET = str.maketrans({"0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t"})
+_BENIGN_ALNUM = re.compile(r"^(\d+[A-Za-z]{1,3}|[A-Za-z]{1,3}\d+|\d+[A-Za-z]?\d*)$")   # 3pm, 5km, mp3, v2, 2000, 4k
+
+
+def _fold_confusables(text: str) -> str:
+    letters = [c for c in text if c.isalpha()]
+    if not letters:
+        return text
+    latin = sum(1 for c in letters if "LATIN" in unicodedata.name(c, ""))
+    return text.translate(_CONFUSABLES) if latin / len(letters) >= 0.5 else text
+
+
+def _collapse_letter_spacing(text: str) -> str:
+    """'i g n o r e' -> 'ignore' (runs of at least four single letters separated by single spaces)."""
+    return _LETTER_SPACED.sub(lambda m: m.group(0).replace(" ", ""), text)
+
+
+def _fold_leet(text: str) -> str:
+    """'1gn0r3' -> 'ignore'. Only mixed letter/digit tokens that are not ordinary quantities or names (3pm, mp3, v2)."""
+    def fix(m):
+        tok = m.group(0)
+        if tok.isdigit() or tok.isalpha() or _BENIGN_ALNUM.match(tok):
+            return tok
+        return tok.translate(_LEET) if sum(c.isalpha() for c in tok) >= 2 else tok
+    return _LEET_TOKEN.sub(fix, text)
 
 
 # ── model-file integrity ────────────────────────────────────

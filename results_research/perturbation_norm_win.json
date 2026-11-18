@@ -1,0 +1,300 @@
+{
+  "thresholds": {
+    "hybrid_instr": 0.7270420200710522,
+    "finetuned_instr": 0.3648621439933777,
+    "protectai_deberta": 0.5301319062709782,
+    "stack": 0.249726183236489
+  },
+  "normalise": true,
+  "window": true,
+  "results": {
+    "original": {
+      "hybrid_instr": {
+        "recall": 0.78,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.52,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.88,
+        "false_alarm": 0.06
+      }
+    },
+    "dilute_1_before": {
+      "hybrid_instr": {
+        "recall": 0.72,
+        "false_alarm": 0.02
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.68,
+        "false_alarm": 0.08
+      },
+      "stack": {
+        "recall": 0.9,
+        "false_alarm": 0.1
+      }
+    },
+    "dilute_3_both": {
+      "hybrid_instr": {
+        "recall": 0.58,
+        "false_alarm": 0.0
+      },
+      "finetuned_instr": {
+        "recall": 0.94,
+        "false_alarm": 0.04
+      },
+      "protectai_deberta": {
+        "recall": 0.74,
+        "false_alarm": 0.1
+      },
+      "stack": {
+        "recall": 0.88,
+        "false_alarm": 0.12
+      }
+    },
+    "dilute_6_both": {
+      "hybrid_instr": {
+        "recall": 0.54,
+        "false_alarm": 0.02
+      },
+      "finetuned_instr": {
+        "recall": 0.86,
+        "false_alarm": 0.04
+      },
+      "protectai_deberta": {
+        "recall": 0.58,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.88,
+        "false_alarm": 0.08
+      }
+    },
+    "lowercase": {
+      "hybrid_instr": {
+        "recall": 0.8,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.6,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.9,
+        "false_alarm": 0.04
+      }
+    },
+    "UPPERCASE": {
+      "hybrid_instr": {
+        "recall": 0.8,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.86,
+        "false_alarm": 0.14
+      },
+      "stack": {
+        "recall": 0.94,
+        "false_alarm": 0.16
+      }
+    },
+    "letter_spacing": {
+      "hybrid_instr": {
+        "recall": 0.76,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.98,
+        "false_alarm": 0.34
+      },
+      "protectai_deberta": {
+        "recall": 0.62,
+        "false_alarm": 0.14
+      },
+      "stack": {
+        "recall": 0.88,
+        "false_alarm": 0.1
+      }
+    },
+    "leetspeak": {
+      "hybrid_instr": {
+        "recall": 0.62,
+        "false_alarm": 0.04
+      },
+      "finetuned_instr": {
+        "recall": 1.0,
+        "false_alarm": 0.62
+      },
+      "protectai_deberta": {
+        "recall": 0.8,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.96,
+        "false_alarm": 0.16
+      }
+    },
+    "cyrillic_homoglyphs": {
+      "hybrid_instr": {
+        "recall": 0.76,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.52,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.86,
+        "false_alarm": 0.06
+      }
+    },
+    "zero_width_chars": {
+      "hybrid_instr": {
+        "recall": 0.8,
+        "false_alarm": 0.06
+      },
+      "finetuned_instr": {
+        "recall": 0.9,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.52,
+        "false_alarm": 0.06
+      },
+      "stack": {
+        "recall": 0.88,
+        "false_alarm": 0.06
+      }
+    },
+    "authority_prefix": {
+      "hybrid_instr": {
+        "recall": 0.98,
+        "false_alarm": 0.64
+      },
+      "finetuned_instr": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      },
+      "protectai_deberta": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      },
+      "stack": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      }
+    },
+    "polite_wrapper": {
+      "hybrid_instr": {
+        "recall": 0.88,
+        "false_alarm": 0.2
+      },
+      "finetuned_instr": {
+        "recall": 0.98,
+        "false_alarm": 0.2
+      },
+      "protectai_deberta": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      },
+      "stack": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      }
+    },
+    "roleplay_quote": {
+      "hybrid_instr": {
+        "recall": 0.96,
+        "false_alarm": 0.38
+      },
+      "finetuned_instr": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      },
+      "protectai_deberta": {
+        "recall": 0.74,
+        "false_alarm": 0.3
+      },
+      "stack": {
+        "recall": 1.0,
+        "false_alarm": 0.64
+      }
+    },
+    "code_fence": {
+      "hybrid_instr": {
+        "recall": 0.84,
+        "false_alarm": 0.18
+      },
+      "finetuned_instr": {
+        "recall": 1.0,
+        "false_alarm": 1.0
+      },
+      "protectai_deberta": {
+        "recall": 0.64,
+        "false_alarm": 0.12
+      },
+      "stack": {
+        "recall": 0.96,
+        "false_alarm": 0.44
+      }
+    },
+    "benign_filler_suffix": {
+      "hybrid_instr": {
+        "recall": 0.5,
+        "false_alarm": 0.0
+      },
+      "finetuned_instr": {
+        "recall": 0.88,
+        "false_alarm": 0.06
+      },
+      "protectai_deberta": {
+        "recall": 0.58,
+        "false_alarm": 0.12
+      },
+      "stack": {
+        "recall": 0.86,
+        "false_alarm": 0.14
+      }
+    },
+    "_benign_multisentence_false_alarm": {
+      "hybrid_instr": {
+        "recall": NaN,
+        "false_alarm": 0.0
+      },
+      "finetuned_instr": {
+        "recall": NaN,
+        "false_alarm": 0.0
+      },
+      "protectai_deberta": {
+        "recall": NaN,
+        "false_alarm": 0.0
+      },
+      "stack": {
+        "recall": NaN,
+        "false_alarm": 0.0
+      }
+    }
+  }
+}
