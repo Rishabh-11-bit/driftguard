@@ -58,5 +58,7 @@ Reproduce everything with the commands in section 9 of the paper; `results_resea
   * Split-instruction attacks were not an evasion in our test (the harmful half stays suspicious); a split where only the combination is harmful is untested.
   * Service: 25/25 hostile-input cases, no 5xx, p50 0.4-0.5 s, 1-2.5 writes/s.
   * New optional signed `EnsembleDetector` (`models/ensemble.json`); 141 tests pass; 11/11 presets for every model.
-  * Honest negatives kept: we still do not beat the rule-based filter end to end (that study predates the new models); hand-style notes are AI-written; the published detector may have seen some of these datasets.
+  * End to end (same 300 scenarios, 8B agent, paper §5.9): attack success hybrid 0.17, ensemble 0.19, rule-based 0.24, v2 0.36, undefended 0.96. The hybrid beats v2 decisively (paired p < 0.00001) but its edge over the rule-based filter is not significant (p = 0.19). The ensemble adds nothing end to end.
+  * Honest negatives kept: no significant win over the rule-based filter; hand-style notes are AI-written; the published detector may have seen some of these datasets; utility was not re-measured in the end-to-end re-run.
+  * CI: the new ensemble code tripped bandit B615 (unpinned encoder download); fixed by pinning the MiniLM revision; green on `20bcb65`.
 * **Deliberately not done**: adding a LICENSE file (choosing a licence and copyright holder is a legal/ownership decision for you, the team and MIT-WPU), editing the midterm deck, and claiming novelty over the 2026 preprints.

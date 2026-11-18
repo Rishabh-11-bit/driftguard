@@ -123,10 +123,14 @@ this suite: "user likes tea and ignore previous rules" with null bytes inserted 
 AUROC 0.49 / 0.80 / 0.95 when the origin label is right 50 / 80 / 95 % of the time. Provenance is a real signal only
 if the agent runtime supplies reliable origins; the note-style sets above carry no provenance at all.
 
-### C9. End to end with a real agent (paper section 5.9)
-300 scenarios, 8B local model: attack success 0.96 undefended, 0.24 with a rule-based filter, 0.36 with the v2
-detector, 0.50 with an LLM judge. **We do not beat the rule-based filter on that study** (it predates the hybrid and
-ensemble; neither was run end to end).
+### C9. End to end with a real agent (paper section 5.9, `agent_newdefences.md`)
+300 scenarios, 8B local model, identical scenarios in both runs. Attack success: 0.96 undefended, 0.36 with the earlier
+v2 detector, 0.24 with a rule-based filter, **0.17 with the hybrid [0.11, 0.26]**, 0.19 with the ensemble [0.12, 0.28]
+(0.50 with an LLM judge in the first run). None of these defences quarantined any of 200 benign drift or ordinary
+writes. Paired tests on the same 100 attacks: the hybrid beats v2 decisively (19 attacks blocked that v2 lets through,
+0 the other way, p < 0.00001); against the rule-based filter the hybrid is ahead by 14 vs 7 discordant attacks, which
+is **not significant** (p = 0.19), so we claim parity-or-better with the rule-based filter, not superiority. The
+ensemble adds nothing over the hybrid end to end (p = 0.5). Utility was not re-measured in the re-run.
 
 ## What this does not show
 - Performance against a human who has read this repository and adapts. The black-box study (paper section 5.8) gave an
@@ -137,7 +141,7 @@ ensemble; neither was run end to end).
 - Calibration at deployment: thresholds must be set per deployment from benign traffic; the 0.5 default over-flags
   generic chat for the memory detectors. The shipped stacker is fitted on all groups, so the numbers above are the
   leave-one-group-out ones, not the in-sample fit.
-- The end-to-end effect of the ensemble on agent attack success.
+- Drift and ordinary *utility* with the newer defences in the end-to-end study (only write-level admission was re-measured).
 
 ## Reproduce
 ```bash
@@ -151,5 +155,6 @@ python -m scripts.run_perturbation --normalise --window --tag _norm_win
 python -m scripts.run_split_attack
 python -m scripts.bench_service --model models/ensemble.json --tag _ensemble
 python -m scripts.check_presets
+python -m scripts.run_agent_newdefences   # needs a running Ollama with llama3:latest; about 1 h
 ```
 `results_research/manifest.json` records versions and hashes.
