@@ -200,7 +200,21 @@ Because plain text classifiers matched v3 in §5.7b, we evaluated fusing them (`
 | Notes C (unseen writer + style) (n=30+60) | 0.918 / 0.22 | 0.988 / 0.03 | 0.978 / 0.07 | 0.994 / 0.02 |
 | Real text, length-matched, unseen (n=126+227) | 0.864 / 0.37 | 0.983 / 0.01 | 0.976 / 0.03 | 0.987 / 0.00 |
 
-The fused scorer is the best or within 0.005 AUROC of the best on every text set (v3 + TF-IDF alone is marginally higher on set C, 0.999 vs 0.994), and it cuts the false-alarm rate at 90 % recall from 0.22-0.48 (v3) to 0.00-0.13. On the benchmark every scorer is perfect, which is another sign the benchmark cannot discriminate between detectors. **Cautions.** (i) On real text, a TF-IDF model reaches AUROC 0.98 largely because the two public datasets differ in vocabulary (TF-IDF cross-validation gets 1.0, §5.6), so those text-model numbers are shortcut-inflated and should not be read as intent detection. (ii) The notes sets are small (90-180) and LLM-written; text models trained on one small model's notes transferred to another model's notes, which suggests shared LLM vocabulary, and a human attacker may not share it. (iii) These sets carry no usable provenance, timing or memory-consistency signal, so they cannot show what the feature detector adds; §5.4 is where provenance earns its keep. We ship the fusion as the default model (`driftguard/detector/hybrid.py`, `scripts/train_hybrid.py`; the feature detector still supplies the drift-vs-ordinary split and all non-text evidence), and we regard a comparison against a fine-tuned transformer classifier as the next step.
+The fused scorer is the best or within 0.005 AUROC of the best on every text set (v3 + TF-IDF alone is marginally higher on set C, 0.999 vs 0.994), and it cuts the false-alarm rate at 90 % recall from 0.22-0.48 (v3) to 0.00-0.13. On the benchmark every scorer is perfect, which is another sign the benchmark cannot discriminate between detectors. **Cautions.** (i) On real text, a TF-IDF model reaches AUROC 0.98 largely because the two public datasets differ in vocabulary (TF-IDF cross-validation gets 1.0, §5.6), so those text-model numbers are shortcut-inflated and should not be read as intent detection. (ii) The notes sets are small (90-180) and LLM-written; text models trained on one small model's notes transferred to another model's notes, which suggests shared LLM vocabulary, and a human attacker may not share it. (iii) These sets carry no usable provenance, timing or memory-consistency signal, so they cannot show what the feature detector adds; §5.4 is where provenance earns its keep. We ship the fusion as the default model (`driftguard/detector/hybrid.py`, `scripts/train_hybrid.py`; the feature detector still supplies the drift-vs-ordinary split and all non-text evidence); the comparison against a fine-tuned transformer is in §5.7d.
+
+### 5.7d Comparison with a fine-tuned transformer
+
+The comparison reviewers ask for first (`scripts/run_finetuned.py`, `results_research/finetuned.md`). We fine-tuned all-MiniLM-L6-v2 end to end with a linear head (3 epochs, AdamW lr 3e-5, batch 32, CPU, seed 42; training loss 0.40 → 0.02) for attack-vs-rest on exactly the rows the hybrid's text models saw, and evaluated on the same four held-out sets. Scorers were fixed in advance: the shipped hybrid, the fine-tuned model, and their unweighted mean. Cell format: AUROC / false-alarm rate needed for 90 % recall.
+
+| Test set | Hybrid (shipped) | Fine-tuned MiniLM | Mean of both |
+|---|---|---|---|
+| Benchmark test (n=40+80) | 1.000 / 0.00 | 1.000 / 0.00 | 1.000 / 0.00 |
+| Notes A (n=60+120) | 0.946 / 0.13 | 0.943 / 0.27 | 0.964 / 0.17 |
+| Notes B, unseen writer (n=30+60) | 0.951 / 0.12 | 0.991 / 0.00 | 0.970 / 0.00 |
+| Notes C, unseen writer + style (n=30+60) | 0.994 / 0.02 | 0.995 / 0.02 | 0.996 / 0.02 |
+| Real text, length-matched, unseen (n=126+227) | 0.987 / 0.00 | 1.000 / 0.00 | 0.998 / 0.00 |
+
+The fine-tuned encoder is at least as good as the hybrid on three of four text sets (clearly better on B, 0.991 vs 0.951) and tied on A and C; it is only worse at the A operating point for 90 % recall (0.27 vs 0.13 false alarms). With 90-180 notes per set, a 0.04 AUROC gap is within what resampling noise could produce, and we ran no paired test, so we do **not** claim it is better. What the comparison does show is that nothing in our feature pipeline beats a plain fine-tuned text encoder on these sets: the same caution as §5.7c applies (vocabulary gap on real text, LLM-written notes, no provenance signal in these sets), and the case for the feature detector rests on §5.4 (provenance, timing, consistency), not on text. We keep the hybrid as the shipped default because it is already integrated, signed and tested and is within noise of the fine-tuned model; shipping the fine-tuned model (about 90 MB, new serialisation and signing path) is the obvious next step if a larger, human-written test set confirms its edge. A-MemGuard (arXiv:2510.02373) remains uncompared.
 
 ### 5.8 Black-box adaptive attacker
 
@@ -284,6 +298,7 @@ python -m scripts.run_generalisation && python -m scripts.run_real_text_eval && 
 python -m scripts.run_independent_eval && python -m scripts.run_independent_eval --attack-as-note   # 5.7 (needs Ollama)
 python -m scripts.generate_notes && python -m scripts.train_v3   # 5.7b (needs Ollama: llama3.2:1b, phi3.5)
 python -m scripts.run_hybrid && python -m scripts.train_hybrid   # 5.7c (fusion evaluation; shipped model)
+python -m scripts.run_finetuned                                  # 5.7d (fine-tuned transformer comparison)
 python -m scripts.check_presets                      # demo presets vs every model
 python -m scripts.run_blackbox_attack                # 5.8 (needs Ollama)
 python -m scripts.run_agent_study --n-per 100 --agent-model llama3:latest --out results_research/agent_big   # 5.9
