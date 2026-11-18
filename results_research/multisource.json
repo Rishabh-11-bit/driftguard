@@ -1,0 +1,1058 @@
+{
+  "jackhhao_jailbreak": {
+    "note": "published labels",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 8526,
+    "tfidf_loso": {
+      "auroc": 0.912175,
+      "auroc_ci95": [
+        0.8817052666226687,
+        0.9374949816053094
+      ],
+      "recall": 0.92,
+      "false_alarm": 0.38,
+      "far_at_90_recall": 0.305
+    },
+    "embed_loso": {
+      "auroc": 0.9409500000000001,
+      "auroc_ci95": [
+        0.918292021586254,
+        0.9602211569741655
+      ],
+      "recall": 0.925,
+      "false_alarm": 0.325,
+      "far_at_90_recall": 0.2
+    },
+    "hybrid_shipped": {
+      "auroc": 0.849575,
+      "auroc_ci95": [
+        0.8068556812331389,
+        0.8859791181110618
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.885,
+      "far_at_90_recall": 0.355
+    },
+    "hybrid_instr": {
+      "auroc": 0.8649999999999999,
+      "auroc_ci95": [
+        0.8309804668312135,
+        0.8991951780857877
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.82,
+      "far_at_90_recall": 0.335
+    },
+    "finetuned_instr": {
+      "auroc": 0.8554,
+      "auroc_ci95": [
+        0.8216873414827411,
+        0.8911011280289688
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.91,
+      "far_at_90_recall": 0.39
+    },
+    "protectai_deberta": {
+      "auroc": 0.965375,
+      "auroc_ci95": [
+        0.9460192902478812,
+        0.9797728888555371
+      ],
+      "recall": 0.73,
+      "false_alarm": 0.005,
+      "far_at_90_recall": 0.07
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.947725,
+      "auroc_ci95": [
+        0.9256321441940281,
+        0.9665265426895588
+      ],
+      "recall": 0.75,
+      "false_alarm": 0.005,
+      "far_at_90_recall": 0.205
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.938025,
+      "auroc_ci95": [
+        0.9116726091845189,
+        0.9607225591157041
+      ],
+      "recall": 0.81,
+      "false_alarm": 0.015,
+      "far_at_90_recall": 0.285
+    },
+    "fuse_all3": {
+      "auroc": 0.94905,
+      "auroc_ci95": [
+        0.9293194769440716,
+        0.9665929610773836
+      ],
+      "recall": 0.99,
+      "false_alarm": 0.73,
+      "far_at_90_recall": 0.18
+    }
+  },
+  "spml_chatbot": {
+    "note": "published labels",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 8376,
+    "tfidf_loso": {
+      "auroc": 0.9614499999999999,
+      "auroc_ci95": [
+        0.9449346559817215,
+        0.97697432557723
+      ],
+      "recall": 0.83,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.135
+    },
+    "embed_loso": {
+      "auroc": 0.894475,
+      "auroc_ci95": [
+        0.8613825998567581,
+        0.9265458250927879
+      ],
+      "recall": 0.705,
+      "false_alarm": 0.1,
+      "far_at_90_recall": 0.36
+    },
+    "hybrid_shipped": {
+      "auroc": 0.8380000000000001,
+      "auroc_ci95": [
+        0.8003609522377161,
+        0.8725610324448676
+      ],
+      "recall": 0.97,
+      "false_alarm": 0.75,
+      "far_at_90_recall": 0.52
+    },
+    "hybrid_instr": {
+      "auroc": 0.8766999999999999,
+      "auroc_ci95": [
+        0.8422823849643848,
+        0.9082539225416
+      ],
+      "recall": 0.955,
+      "false_alarm": 0.545,
+      "far_at_90_recall": 0.34
+    },
+    "finetuned_instr": {
+      "auroc": 0.9135499999999999,
+      "auroc_ci95": [
+        0.8870235211432036,
+        0.9393405666592276
+      ],
+      "recall": 0.955,
+      "false_alarm": 0.57,
+      "far_at_90_recall": 0.28
+    },
+    "protectai_deberta": {
+      "auroc": 0.9952375,
+      "auroc_ci95": [
+        0.990119848797674,
+        0.9990975698968212
+      ],
+      "recall": 0.985,
+      "false_alarm": 0.085,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.982525,
+      "auroc_ci95": [
+        0.9708191958596931,
+        0.9925815591891156
+      ],
+      "recall": 0.985,
+      "false_alarm": 0.085,
+      "far_at_90_recall": 0.03
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9899499999999999,
+      "auroc_ci95": [
+        0.9819687839870659,
+        0.996231331505945
+      ],
+      "recall": 0.99,
+      "false_alarm": 0.075,
+      "far_at_90_recall": 0.02
+    },
+    "fuse_all3": {
+      "auroc": 0.978325,
+      "auroc_ci95": [
+        0.9643919315438634,
+        0.991513004422844
+      ],
+      "recall": 0.985,
+      "false_alarm": 0.33,
+      "far_at_90_recall": 0.02
+    }
+  },
+  "geekyrakshit_injection": {
+    "note": "published labels",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 8231,
+    "tfidf_loso": {
+      "auroc": 0.7768250000000001,
+      "auroc_ci95": [
+        0.7335344488630089,
+        0.8209847109739606
+      ],
+      "recall": 0.675,
+      "false_alarm": 0.285,
+      "far_at_90_recall": 0.55
+    },
+    "embed_loso": {
+      "auroc": 0.7942500000000001,
+      "auroc_ci95": [
+        0.7495753212255729,
+        0.8356203964089693
+      ],
+      "recall": 0.9,
+      "false_alarm": 0.575,
+      "far_at_90_recall": 0.575
+    },
+    "hybrid_shipped": {
+      "auroc": 0.79365,
+      "auroc_ci95": [
+        0.7474996942992457,
+        0.8348369154446346
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.955,
+      "far_at_90_recall": 0.48
+    },
+    "hybrid_instr": {
+      "auroc": 0.798125,
+      "auroc_ci95": [
+        0.754810241015087,
+        0.8394801980198021
+      ],
+      "recall": 0.99,
+      "false_alarm": 0.935,
+      "far_at_90_recall": 0.485
+    },
+    "finetuned_instr": {
+      "auroc": 0.7150249999999999,
+      "auroc_ci95": [
+        0.6660434421819096,
+        0.7657802203345334
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.98,
+      "far_at_90_recall": 0.615
+    },
+    "protectai_deberta": {
+      "auroc": 0.8830625,
+      "auroc_ci95": [
+        0.8500334336768097,
+        0.9156645757703571
+      ],
+      "recall": 0.97,
+      "false_alarm": 0.825,
+      "far_at_90_recall": 0.31
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.82525,
+      "auroc_ci95": [
+        0.783739147547752,
+        0.8655440564649903
+      ],
+      "recall": 0.97,
+      "false_alarm": 0.835,
+      "far_at_90_recall": 0.405
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.794,
+      "auroc_ci95": [
+        0.7472585104848292,
+        0.8359834689320508
+      ],
+      "recall": 0.99,
+      "false_alarm": 0.885,
+      "far_at_90_recall": 0.465
+    },
+    "fuse_all3": {
+      "auroc": 0.8258,
+      "auroc_ci95": [
+        0.7808779299497112,
+        0.8635309111117491
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.975,
+      "far_at_90_recall": 0.395
+    }
+  },
+  "deepset": {
+    "note": "published labels; shipped models saw a slice (contaminated)",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 8569,
+    "tfidf_loso": {
+      "auroc": 0.8026374999999999,
+      "auroc_ci95": [
+        0.7623474931768075,
+        0.8429561728362097
+      ],
+      "recall": 0.365,
+      "false_alarm": 0.01,
+      "far_at_90_recall": 0.635
+    },
+    "embed_loso": {
+      "auroc": 0.740625,
+      "auroc_ci95": [
+        0.6912216368370384,
+        0.7878140265464341
+      ],
+      "recall": 0.34,
+      "false_alarm": 0.05,
+      "far_at_90_recall": 0.755
+    },
+    "hybrid_shipped": {
+      "auroc": 0.74905,
+      "auroc_ci95": [
+        0.7018498739552105,
+        0.7934253268666455
+      ],
+      "recall": 0.975,
+      "false_alarm": 0.87,
+      "far_at_90_recall": 0.64
+    },
+    "hybrid_instr": {
+      "auroc": 0.739725,
+      "auroc_ci95": [
+        0.6923430375580848,
+        0.7839162619948337
+      ],
+      "recall": 0.965,
+      "false_alarm": 0.84,
+      "far_at_90_recall": 0.655
+    },
+    "finetuned_instr": {
+      "auroc": 0.6831375,
+      "auroc_ci95": [
+        0.6375633852911624,
+        0.7349488488507866
+      ],
+      "recall": 0.98,
+      "false_alarm": 0.875,
+      "far_at_90_recall": 0.645
+    },
+    "protectai_deberta": {
+      "auroc": 0.8733,
+      "auroc_ci95": [
+        0.8366110183415857,
+        0.9059962601920312
+      ],
+      "recall": 0.41,
+      "false_alarm": 0.01,
+      "far_at_90_recall": 0.67
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.8263750000000001,
+      "auroc_ci95": [
+        0.7813591993085565,
+        0.8637917787705977
+      ],
+      "recall": 0.425,
+      "false_alarm": 0.01,
+      "far_at_90_recall": 0.625
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.8146249999999999,
+      "auroc_ci95": [
+        0.7692962373335471,
+        0.8518548654086249
+      ],
+      "recall": 0.505,
+      "false_alarm": 0.015,
+      "far_at_90_recall": 0.6
+    },
+    "fuse_all3": {
+      "auroc": 0.8276749999999999,
+      "auroc_ci95": [
+        0.7865472170106317,
+        0.8680889407788667
+      ],
+      "recall": 0.96,
+      "false_alarm": 0.725,
+      "far_at_90_recall": 0.63
+    }
+  },
+  "safeguard": {
+    "note": "published labels; shipped models saw a slice (contaminated)",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 8231,
+    "tfidf_loso": {
+      "auroc": 0.956125,
+      "auroc_ci95": [
+        0.9383837869636852,
+        0.9713930730266875
+      ],
+      "recall": 0.865,
+      "false_alarm": 0.13,
+      "far_at_90_recall": 0.16
+    },
+    "embed_loso": {
+      "auroc": 0.9708499999999999,
+      "auroc_ci95": [
+        0.9562702006019456,
+        0.9838918067226892
+      ],
+      "recall": 0.95,
+      "false_alarm": 0.12,
+      "far_at_90_recall": 0.07
+    },
+    "hybrid_shipped": {
+      "auroc": 0.940625,
+      "auroc_ci95": [
+        0.9172654712141449,
+        0.9610474426984285
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.805,
+      "far_at_90_recall": 0.18
+    },
+    "hybrid_instr": {
+      "auroc": 0.936375,
+      "auroc_ci95": [
+        0.9148074032162832,
+        0.9569138511128239
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.735,
+      "far_at_90_recall": 0.235
+    },
+    "finetuned_instr": {
+      "auroc": 0.962925,
+      "auroc_ci95": [
+        0.9458715027387633,
+        0.9779099456689366
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.805,
+      "far_at_90_recall": 0.1
+    },
+    "protectai_deberta": {
+      "auroc": 0.9888750000000001,
+      "auroc_ci95": [
+        0.9789916570822195,
+        0.9960780327294564
+      ],
+      "recall": 0.79,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.02
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9890500000000001,
+      "auroc_ci95": [
+        0.9805136240465677,
+        0.9958699566257043
+      ],
+      "recall": 0.82,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.005
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9893749999999999,
+      "auroc_ci95": [
+        0.97720827217109,
+        0.9974352831810679
+      ],
+      "recall": 0.895,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_all3": {
+      "auroc": 0.987375,
+      "auroc_ci95": [
+        0.9763415255924766,
+        0.9961191799135436
+      ],
+      "recall": 0.995,
+      "false_alarm": 0.575,
+      "far_at_90_recall": 0.005
+    }
+  },
+  "gandalf_vs_instructions": {
+    "note": "paired sources (shortcut risk)",
+    "n": 400,
+    "n_attack": 200,
+    "train_rows_loso": 6455,
+    "tfidf_loso": {
+      "auroc": 0.9879749999999999,
+      "auroc_ci95": [
+        0.9795737285160845,
+        0.9947671854781448
+      ],
+      "recall": 0.91,
+      "false_alarm": 0.015,
+      "far_at_90_recall": 0.015
+    },
+    "embed_loso": {
+      "auroc": 0.9741,
+      "auroc_ci95": [
+        0.9616551883850352,
+        0.9859897080006779
+      ],
+      "recall": 0.925,
+      "false_alarm": 0.1,
+      "far_at_90_recall": 0.075
+    },
+    "hybrid_shipped": {
+      "auroc": 0.978,
+      "auroc_ci95": [
+        0.9661132114344182,
+        0.9890304373294885
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.675,
+      "far_at_90_recall": 0.06
+    },
+    "hybrid_instr": {
+      "auroc": 0.973625,
+      "auroc_ci95": [
+        0.9589689881748283,
+        0.9862555034781516
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.55,
+      "far_at_90_recall": 0.08
+    },
+    "finetuned_instr": {
+      "auroc": 0.9296000000000001,
+      "auroc_ci95": [
+        0.9067841235239704,
+        0.9521102735273528
+      ],
+      "recall": 0.99,
+      "false_alarm": 0.64,
+      "far_at_90_recall": 0.185
+    },
+    "protectai_deberta": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_ft+deb": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_all3": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.3,
+      "far_at_90_recall": 0.0
+    }
+  },
+  "injecagent_vs_notes": {
+    "note": "paired sources (shortcut risk)",
+    "n": 124,
+    "n_attack": 62,
+    "train_rows_loso": 7631,
+    "tfidf_loso": {
+      "auroc": 0.9669614984391259,
+      "auroc_ci95": [
+        0.939413397855883,
+        0.9878774204871995
+      ],
+      "recall": 0.6935483870967742,
+      "false_alarm": 0.016129032258064516,
+      "far_at_90_recall": 0.11290322580645161
+    },
+    "embed_loso": {
+      "auroc": 0.9940166493236212,
+      "auroc_ci95": [
+        0.983019853709509,
+        1.0
+      ],
+      "recall": 0.7580645161290323,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.016129032258064516
+    },
+    "hybrid_shipped": {
+      "auroc": 0.9994797086368367,
+      "auroc_ci95": [
+        0.9976574084612383,
+        1.0
+      ],
+      "recall": 0.9838709677419355,
+      "false_alarm": 0.016129032258064516,
+      "far_at_90_recall": 0.0
+    },
+    "hybrid_instr": {
+      "auroc": 0.9976586888657648,
+      "auroc_ci95": [
+        0.9907486979166666,
+        1.0
+      ],
+      "recall": 0.9838709677419355,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "finetuned_instr": {
+      "auroc": 0.9958376690946931,
+      "auroc_ci95": [
+        0.9861366062818571,
+        1.0
+      ],
+      "recall": 0.9354838709677419,
+      "false_alarm": 0.016129032258064516,
+      "far_at_90_recall": 0.016129032258064516
+    },
+    "protectai_deberta": {
+      "auroc": 0.9838709677419355,
+      "auroc_ci95": [
+        0.9464321345525389,
+        1.0
+      ],
+      "recall": 0.14516129032258066,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9976586888657648,
+      "auroc_ci95": [
+        0.9915502854633289,
+        1.0
+      ],
+      "recall": 0.14516129032258066,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9963579604578564,
+      "auroc_ci95": [
+        0.988244514106583,
+        1.0
+      ],
+      "recall": 0.3548387096774194,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.016129032258064516
+    },
+    "fuse_all3": {
+      "auroc": 0.9986992715920916,
+      "auroc_ci95": [
+        0.9949784061277706,
+        1.0
+      ],
+      "recall": 0.8870967741935484,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    }
+  },
+  "notes_D": {
+    "note": "assistant-written, hand style",
+    "n": 100,
+    "n_attack": 50,
+    "train_rows_loso": 9231,
+    "tfidf_loso": {
+      "auroc": 0.8824000000000001,
+      "auroc_ci95": [
+        0.8188226876459134,
+        0.9420012043356082
+      ],
+      "recall": 0.82,
+      "false_alarm": 0.24,
+      "far_at_90_recall": 0.34
+    },
+    "embed_loso": {
+      "auroc": 0.9364,
+      "auroc_ci95": [
+        0.8847076898795648,
+        0.9791997872816838
+      ],
+      "recall": 0.94,
+      "false_alarm": 0.18,
+      "far_at_90_recall": 0.16
+    },
+    "hybrid_shipped": {
+      "auroc": 0.8932,
+      "auroc_ci95": [
+        0.8198399078523513,
+        0.9437923749045072
+      ],
+      "recall": 0.96,
+      "false_alarm": 0.36,
+      "far_at_90_recall": 0.3
+    },
+    "hybrid_instr": {
+      "auroc": 0.954,
+      "auroc_ci95": [
+        0.9180601898101898,
+        0.9834065546218487
+      ],
+      "recall": 0.96,
+      "false_alarm": 0.24,
+      "far_at_90_recall": 0.14
+    },
+    "finetuned_instr": {
+      "auroc": 0.9843999999999999,
+      "auroc_ci95": [
+        0.9612762237762237,
+        0.9975845410628019
+      ],
+      "recall": 0.9,
+      "false_alarm": 0.04,
+      "far_at_90_recall": 0.02
+    },
+    "protectai_deberta": {
+      "auroc": 0.9296,
+      "auroc_ci95": [
+        0.8777502938871473,
+        0.9686872741870735
+      ],
+      "recall": 0.5,
+      "false_alarm": 0.06,
+      "far_at_90_recall": 0.18
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9424,
+      "auroc_ci95": [
+        0.8946649522957663,
+        0.9768477011494253
+      ],
+      "recall": 0.54,
+      "false_alarm": 0.06,
+      "far_at_90_recall": 0.1
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9696,
+      "auroc_ci95": [
+        0.9302801231792679,
+        0.9963768115942029
+      ],
+      "recall": 0.7,
+      "false_alarm": 0.04,
+      "far_at_90_recall": 0.06
+    },
+    "fuse_all3": {
+      "auroc": 0.9696,
+      "auroc_ci95": [
+        0.9334079430134531,
+        0.9956157222504386
+      ],
+      "recall": 0.92,
+      "false_alarm": 0.04,
+      "far_at_90_recall": 0.04
+    }
+  },
+  "notes_A": {
+    "note": "LLM-written",
+    "n": 120,
+    "n_attack": 60,
+    "train_rows_loso": 9231,
+    "tfidf_loso": {
+      "auroc": 0.9011111111111112,
+      "auroc_ci95": [
+        0.8285721805439783,
+        0.9530672100945495
+      ],
+      "recall": 0.85,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.25
+    },
+    "embed_loso": {
+      "auroc": 0.8594444444444443,
+      "auroc_ci95": [
+        0.7794380952380953,
+        0.918996954658245
+      ],
+      "recall": 0.7166666666666667,
+      "false_alarm": 0.2,
+      "far_at_90_recall": 0.4166666666666667
+    },
+    "hybrid_shipped": {
+      "auroc": 0.9416666666666667,
+      "auroc_ci95": [
+        0.8958827036291824,
+        0.9776209677419354
+      ],
+      "recall": 0.5666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.15
+    },
+    "hybrid_instr": {
+      "auroc": 0.95,
+      "auroc_ci95": [
+        0.9136279404478904,
+        0.9853508671195298
+      ],
+      "recall": 0.5666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.13333333333333333
+    },
+    "finetuned_instr": {
+      "auroc": 0.9391666666666666,
+      "auroc_ci95": [
+        0.8947788001472212,
+        0.9754504916880211
+      ],
+      "recall": 0.8,
+      "false_alarm": 0.08333333333333333,
+      "far_at_90_recall": 0.2
+    },
+    "protectai_deberta": {
+      "auroc": 0.748611111111111,
+      "auroc_ci95": [
+        0.647303259200189,
+        0.8389767754346803
+      ],
+      "recall": 0.35,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.9166666666666666
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9558333333333333,
+      "auroc_ci95": [
+        0.9145803270803271,
+        0.984167292152165
+      ],
+      "recall": 0.36666666666666664,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.15
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9413888888888888,
+      "auroc_ci95": [
+        0.8976421820670987,
+        0.9763469919546115
+      ],
+      "recall": 0.5,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.21666666666666667
+    },
+    "fuse_all3": {
+      "auroc": 0.9566666666666667,
+      "auroc_ci95": [
+        0.921799996954191,
+        0.9856364121989123
+      ],
+      "recall": 0.6333333333333333,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.15
+    }
+  },
+  "notes_B": {
+    "note": "LLM-written",
+    "n": 60,
+    "n_attack": 30,
+    "train_rows_loso": 9231,
+    "tfidf_loso": {
+      "auroc": 0.9677777777777778,
+      "auroc_ci95": [
+        0.9182146829810901,
+        0.9988734440940323
+      ],
+      "recall": 0.8666666666666667,
+      "false_alarm": 0.06666666666666667,
+      "far_at_90_recall": 0.06666666666666667
+    },
+    "embed_loso": {
+      "auroc": 0.9444444444444444,
+      "auroc_ci95": [
+        0.857775454194725,
+        0.9994698660714285
+      ],
+      "recall": 0.9,
+      "false_alarm": 0.1,
+      "far_at_90_recall": 0.1
+    },
+    "hybrid_shipped": {
+      "auroc": 0.9500000000000001,
+      "auroc_ci95": [
+        0.8822792658730159,
+        0.9977573749616214
+      ],
+      "recall": 0.8,
+      "false_alarm": 0.06666666666666667,
+      "far_at_90_recall": 0.06666666666666667
+    },
+    "hybrid_instr": {
+      "auroc": 0.9555555555555555,
+      "auroc_ci95": [
+        0.8932861626221001,
+        1.0
+      ],
+      "recall": 0.8666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.03333333333333333
+    },
+    "finetuned_instr": {
+      "auroc": 0.9911111111111112,
+      "auroc_ci95": [
+        0.9656509238310709,
+        1.0
+      ],
+      "recall": 0.9,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "protectai_deberta": {
+      "auroc": 0.9288888888888889,
+      "auroc_ci95": [
+        0.8467031249999999,
+        0.9833664692360344
+      ],
+      "recall": 0.43333333333333335,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.23333333333333334
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9588888888888889,
+      "auroc_ci95": [
+        0.898849826388889,
+        1.0
+      ],
+      "recall": 0.4666666666666667,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.03333333333333333
+    },
+    "fuse_ft+deb": {
+      "auroc": 0.9933333333333334,
+      "auroc_ci95": [
+        0.9743328246724986,
+        1.0
+      ],
+      "recall": 0.6333333333333333,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_all3": {
+      "auroc": 0.971111111111111,
+      "auroc_ci95": [
+        0.9152701306953225,
+        1.0
+      ],
+      "recall": 0.7333333333333333,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    }
+  },
+  "notes_C": {
+    "note": "LLM-written",
+    "n": 60,
+    "n_attack": 30,
+    "train_rows_loso": 9231,
+    "tfidf_loso": {
+      "auroc": 0.9955555555555555,
+      "auroc_ci95": [
+        0.9835690045248868,
+        1.0
+      ],
+      "recall": 0.8666666666666667,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "embed_loso": {
+      "auroc": 0.97,
+      "auroc_ci95": [
+        0.9242673611111112,
+        0.9955555555555556
+      ],
+      "recall": 0.8666666666666667,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.1
+    },
+    "hybrid_shipped": {
+      "auroc": 0.9977777777777778,
+      "auroc_ci95": [
+        0.9897640271493212,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.1,
+      "far_at_90_recall": 0.0
+    },
+    "hybrid_instr": {
+      "auroc": 0.9977777777777778,
+      "auroc_ci95": [
+        0.990983997846743,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.0
+    },
+    "finetuned_instr": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 1.0,
+      "false_alarm": 0.03333333333333333,
+      "far_at_90_recall": 0.0
+    },
+    "protectai_deberta": {
+      "auroc": 0.943888888888889,
+      "auroc_ci95": [
+        0.8782480751181868,
+        0.9918800238072468
+      ],
+      "recall": 0.6333333333333333,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.2
+    },
+    "fuse_hybrid+deb": {
+      "auroc": 0.9977777777777778,
+      "auroc_ci95": [
+        0.9895833333333334,
+        1.0
+      ],
+      "recall": 0.6666666666666666,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_ft+deb": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 0.7,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    },
+    "fuse_all3": {
+      "auroc": 1.0,
+      "auroc_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "recall": 0.9666666666666667,
+      "false_alarm": 0.0,
+      "far_at_90_recall": 0.0
+    }
+  }
+}

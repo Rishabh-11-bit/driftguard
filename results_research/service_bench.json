@@ -1,0 +1,146 @@
+{
+  "latency_ms": {
+    "n": 200,
+    "p50": 391.67360006831586,
+    "p95": 654.7854000236839,
+    "p99": 910.2452000370249,
+    "mean": 393.6978104978334,
+    "throughput_rps_sequential": 2.5400192059374005
+  },
+  "concurrency": {
+    "threads": 4,
+    "requests": 100,
+    "wall_s": 96.49774949997663,
+    "throughput_rps": 1.0362935977074181,
+    "server_errors": 0
+  },
+  "robustness": {
+    "zero_width_split": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "rtl_override": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "homoglyphs": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "null_bytes": {
+      "status": 200,
+      "ok": true,
+      "verdict": "ordinary_learning"
+    },
+    "emoji_only": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "very_long_note": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "repeated_attack": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "mixed_scripts": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "control_chars": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "only_punctuation": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "single_char": {
+      "status": 200,
+      "ok": true,
+      "verdict": "ordinary_learning"
+    },
+    "newlines_tabs": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "html_script": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "sql_like": {
+      "status": 200,
+      "ok": true,
+      "verdict": "ordinary_learning"
+    },
+    "format_string": {
+      "status": 200,
+      "ok": true,
+      "verdict": "malicious"
+    },
+    "malformed_json": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "wrong_types": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "missing_fields": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "no_key": {
+      "status": 401,
+      "ok": true,
+      "verdict": null
+    },
+    "wrong_key": {
+      "status": 401,
+      "ok": true,
+      "verdict": null
+    },
+    "bad_origin": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "bad_session_id": {
+      "status": 422,
+      "ok": true,
+      "verdict": null
+    },
+    "oversized_body": {
+      "status": 413,
+      "ok": true,
+      "verdict": null
+    },
+    "unknown_route": {
+      "status": 404,
+      "ok": true,
+      "verdict": null
+    },
+    "docs_disabled": {
+      "status": 404,
+      "ok": true,
+      "verdict": null
+    }
+  },
+  "robustness_pass": "25/25",
+  "no_5xx_anywhere": true
+}
