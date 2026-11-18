@@ -35,10 +35,11 @@ from sklearn.metrics import roc_auc_score, roc_curve
 
 from driftguard.benchmark.labelling import load_benchmark
 from driftguard.detector.features import FeatureExtractor, SemanticFeatureExtractor
-from driftguard.detector.hybrid import load_detector
+from driftguard.detector.hybrid import load_detector, windows
+from driftguard.security import normalise_text
 
 app = typer.Typer()
-MAXCH = 600
+MAXCH = 700
 
 
 def jl(path: Path) -> list[dict]:
@@ -94,6 +95,8 @@ def main(
     notes: Path = Path("data/llm_notes.jsonl"), hand: Path = Path("data/hand_notes.tsv"),
     train_extra: Path = Path("data/hand_train.tsv"), benchmark: Path = Path("data/benchmark_hard.jsonl"),
     cap: int = 400, loso_per_source: int = 1500, out: Path = Path("results_research"), seed: int = 0,
+    only: str = typer.Option("", help="comma-separated group names to (re)run, e.g. injecagent_toolresp"),
+    tag: str = typer.Option("", help="suffix for the output files, e.g. _tool"),
 ) -> None:
     rng = random.Random(seed)
     nrng = np.random.default_rng(seed)
@@ -111,6 +114,8 @@ def main(
         "gandalf_vs_instructions": (["gandalf_attack", "dolly_benign", "alpaca_benign"], "paired sources (shortcut risk)"),
         "injecagent_vs_notes": (["injecagent_dh", "injecagent_ds", "synthetic_persona_benign", "oasst_benign"],
                                 "paired sources (shortcut risk)"),
+        "injecagent_toolresp": (["injecagent_toolresp"], "minimal pairs: same tool response with / without the injected instruction"),
+        "asb_vs_user_instructions": (["asb_attack", "injecagent_user_benign"], "paired sources (shortcut risk)"),
         "notes_D": (["notes_D"], "assistant-written, hand style"),
         "notes_A": (["notes_A"], "LLM-written"), "notes_B": (["notes_B"], "LLM-written"), "notes_C": (["notes_C"], "LLM-written"),
     }
@@ -118,7 +123,8 @@ def main(
     for g, (names, _) in groups.items():
         data = subsample(merge(*names), cap, rng)
         if data and 0 < sum(y for _, y in data) < len(data):
-            tests[g] = ([t for t, _ in data], np.array([y for _, y in data]))
+            # the product normalises every write before scoring (confusables, spacing, leetspeak, invisible characters)
+            tests[g] = ([normalise_text(t) for t, _ in data], np.array([y for _, y in data]))
         else:
             print(f"skip {g}: missing or single-class", flush=True)
 
@@ -135,6 +141,16 @@ def main(
                              last_query=d.last_query, memory_entries=d.memory_entries))
         return ext_f.extract_batch(recs)
 
+    def wmax(fn, texts):
+        """max over the note and its sentence windows (same rule as the shipped hybrid)"""
+        groups_ = [windows(t) for t in texts]
+        flat = np.asarray(fn([w for g in groups_ for w in g]))
+        out, i = [], 0
+        for g in groups_:
+            out.append(flat[i:i + len(g)].max())
+            i += len(g)
+        return np.array(out)
+
     scorers = {}
     for name, path in (("hybrid_shipped", "models/classifier_hybrid.pkl"), ("hybrid_instr", "models/classifier_hybrid_instr.pkl")):
         if Path(path).exists():
@@ -147,7 +163,7 @@ def main(
         tok = AutoTokenizer.from_pretrained(NAME)
         ft = Clf()
         ft.load_state_dict(torch.load("models/finetuned_minilm_instr.pt"))
-        scorers["finetuned_instr"] = lambda texts: predict(ft, tok, texts)
+        scorers["finetuned_instr"] = lambda texts: wmax(lambda x: predict(ft, tok, x), texts)
     try:
         from transformers import pipeline
         pipe = pipeline("text-classification", model="protectai/deberta-v3-base-prompt-injection-v2",
@@ -156,7 +172,7 @@ def main(
         def deb(texts):
             res = pipe(list(texts), batch_size=16)
             return np.array([r["score"] if r["label"].upper().startswith("INJ") else 1 - r["score"] for r in res])
-        scorers["protectai_deberta"] = deb
+        scorers["protectai_deberta"] = lambda texts: wmax(deb, texts)
     except Exception as e:     # offline or model moved: say so in the output instead of failing the whole run
         print(f"protectai baseline unavailable: {type(e).__name__}: {str(e)[:100]}", flush=True)
 
@@ -166,8 +182,17 @@ def main(
                                                       for r in jl(notes) if r["split"] == "train"]
     result: dict = {}
     raw_scores: dict = {}
+    if only and not tag:     # partial rerun: keep the groups that are not being recomputed
+        if (out / "multisource.json").exists() and (out / "multisource_scores.json").exists():
+            result = json.loads((out / "multisource.json").read_text())
+            raw_scores = json.loads((out / "multisource_scores.json").read_text())
     for g, (texts, y) in tests.items():
-        held = set(groups[g][0])
+        if only and g not in only.split(","):
+            continue
+        # sources of one family share strings (InjecAgent attacker instructions appear inside its tool responses), so a
+        # held-out group removes the whole family from the leave-one-out training pool
+        fam = lambda n: n.split("_")[0] if n.startswith(("injecagent", "asb")) else n
+        held = {n for n in S if fam(n) in {fam(h) for h in groups[g][0]}}
         pool = list(always) if not g.startswith("notes_") else list(always)
         for name, rows_ in S.items():
             if name in held or name.startswith("notes_"):
@@ -198,8 +223,8 @@ def main(
         print(g, {k: round(v["auroc"], 3) for k, v in result[g].items() if isinstance(v, dict)}, flush=True)
 
     out.mkdir(exist_ok=True)
-    (out / "multisource.json").write_text(json.dumps(result, indent=2))
-    (out / "multisource_scores.json").write_text(json.dumps(raw_scores))
+    (out / f"multisource{tag}.json").write_text(json.dumps(result, indent=2))
+    (out / f"multisource_scores{tag}.json").write_text(json.dumps(raw_scores))
     names = [n for n in ("hybrid_shipped", "hybrid_instr", "finetuned_instr", "protectai_deberta", "tfidf_loso", "embed_loso",
                          "fuse_hybrid+deb", "fuse_ft+deb", "fuse_all3")
              if any(n in v for v in result.values())]
@@ -214,7 +239,7 @@ def main(
     lines += ["", "Recall at threshold 0.5:", "", "| Test group | " + " | ".join(names) + " |", "|---|" + "---|" * len(names)]
     for g, v in result.items():
         lines.append(f"| {g} | " + " | ".join(f"{v[n]['recall']:.2f}" if n in v else "n/a" for n in names) + " |")
-    (out / "multisource.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / f"multisource{tag}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

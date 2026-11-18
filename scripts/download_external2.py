@@ -105,6 +105,28 @@ def main(out: Path = Path("data/external2"), n: int = 1000, seed: int = 7) -> No
         except Exception as e:   # network or schema drift: report and continue
             print(f"injecagent_{kind}: skipped ({type(e).__name__}: {str(e)[:80]})")
 
+    # InjecAgent tool responses: the same response with the injected instruction (attack) and with the slot filled by
+    # a neutral value (benign) -> minimal pairs that differ only by the injection. Also ASB attacker instructions.
+    gh = "https://raw.githubusercontent.com/"
+    try:
+        atk, ben, seen = [], [], set()
+        for f in ("test_cases_dh_base", "test_cases_ds_base", "test_cases_dh_enhanced", "test_cases_ds_enhanced"):
+            for c in requests.get(f"{gh}uiuc-kang-lab/InjecAgent/main/data/{f}.json", timeout=60).json():
+                key = (c["Tool Response Template"], c["Attacker Instruction"])
+                if key in seen or "<Attacker Instruction>" not in c["Tool Response Template"]:
+                    continue
+                seen.add(key)
+                atk.append(dict(text=one(c["Tool Response"]), label=1))
+                slot = random.Random(len(ben)).choice(sets["synthetic_persona_benign"])["text"]   # ordinary text in the slot
+                ben.append(dict(text=one(c["Tool Response Template"].replace("<Attacker Instruction>", slot)), label=0))
+        sets["injecagent_toolresp"] = atk + ben
+        users = [json.loads(l) for l in requests.get(f"{gh}uiuc-kang-lab/InjecAgent/main/data/user_cases.jsonl", timeout=60).text.splitlines() if l.strip()]
+        sets["injecagent_user_benign"] = [dict(text=one(u["User Instruction"]), label=0) for u in users]
+        asb = [json.loads(l) for l in requests.get(f"{gh}agiresearch/ASB/main/data/all_attack_tools.jsonl", timeout=60).text.splitlines() if l.strip()]
+        sets["asb_attack"] = [dict(text=one(a["Attacker Instruction"]), label=1) for a in asb]
+    except Exception as e:
+        print(f"github sources skipped ({type(e).__name__}: {str(e)[:80]})")
+
     for name, recs in sets.items():
         recs = [dict(r, source=name) for r in recs if 8 <= len(r["text"]) <= 1500]
         (out / f"{name}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in recs), encoding="utf-8")

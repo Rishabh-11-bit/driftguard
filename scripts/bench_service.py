@@ -52,7 +52,8 @@ def pct(xs, q):
 
 
 @app.command()
-def main(model: str = "models/classifier_hybrid.pkl", n: int = 200, threads: int = 4, out: Path = Path("results_research")) -> None:
+def main(model: str = "models/classifier_hybrid.pkl", n: int = 200, threads: int = 4, out: Path = Path("results_research"),
+         tag: str = typer.Option("", help="suffix for output files, e.g. _ensemble")) -> None:
     det = load_detector(model)
     ticks = iter(range(10**9))
     api = create_app(api_keys={KEY: "bench"}, classifier=det, clock=lambda: next(ticks) * 1.0)
@@ -120,7 +121,7 @@ def main(model: str = "models/classifier_hybrid.pkl", n: int = 200, threads: int
     res["no_5xx_anywhere"] = all(v["status"] < 500 for v in rob.values()) and not errs
 
     out.mkdir(exist_ok=True)
-    (out / "service_bench.json").write_text(json.dumps(res, indent=2))
+    (out / f"service_bench{tag}.json").write_text(json.dumps(res, indent=2))
     L = res["latency_ms"]
     lines = [f"Model: `{model}` (in-process, CPU). {n} sequential writes: p50 {L['p50']:.0f} ms, p95 {L['p95']:.0f} ms, "
              f"p99 {L['p99']:.0f} ms, {L['throughput_rps_sequential']:.1f} req/s.",
@@ -128,7 +129,7 @@ def main(model: str = "models/classifier_hybrid.pkl", n: int = 200, threads: int
              f"{len(errs)} server errors.", f"Robustness: {res['robustness_pass']} controlled responses; 5xx anywhere: "
              f"{not res['no_5xx_anywhere']}.", "", "| Case | HTTP | Pass | Verdict |", "|---|---|---|---|"]
     lines += [f"| {k} | {v['status']} | {'yes' if v['ok'] else '**NO**'} | {v['verdict'] or ''} |" for k, v in rob.items()]
-    (out / "service_bench.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / f"service_bench{tag}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 
 

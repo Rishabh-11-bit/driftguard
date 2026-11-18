@@ -15,6 +15,8 @@ like every other model, and loaded through the same signature check.
 
 from __future__ import annotations
 
+import ast
+import json
 import pickle
 import re
 from pathlib import Path
@@ -28,8 +30,46 @@ _SENT = re.compile(r"(?<=[.!?;:])\s+|\n+")
 MAX_WINDOWS = 12
 
 
+def _leaves(text: str) -> list[str]:
+    """String values (3+ words) of a JSON / Python-dict-style tool output, or [] if the text is not structured."""
+    s = text.strip().strip('"')
+    if s[:1] not in ("{", "["):
+        return []
+    try:
+        obj = ast.literal_eval(s)
+    except (ValueError, SyntaxError, MemoryError, RecursionError):
+        try:
+            obj = json.loads(s)
+        except (ValueError, RecursionError):
+            return []
+    out: list[str] = []
+
+    def walk(o, depth=0):
+        if depth > 8 or len(out) > 200:
+            return
+        if isinstance(o, str):
+            if len(o.split()) >= 3:
+                out.append(o)
+        elif isinstance(o, dict):
+            for v in o.values():
+                walk(v, depth + 1)
+        elif isinstance(o, (list, tuple)):
+            for v in o:
+                walk(v, depth + 1)
+
+    walk(obj)
+    return list(dict.fromkeys(out))
+
+
 def windows(text: str, max_windows: int = MAX_WINDOWS) -> list[str]:
-    """The whole note plus its sentences and adjacent sentence pairs (capped, so cost stays bounded)."""
+    """The whole note plus its sentences and adjacent sentence pairs (capped, so cost stays bounded).
+
+    Structured tool output (JSON / dict repr) is unwrapped: its string fields are scored on their own, because an
+    injected instruction sits in one field and the surrounding JSON syntax is unlike anything a note detector saw
+    (on InjecAgent tool responses this raised AUROC from 0.88 to 0.96, docs/EVIDENCE.md)."""
+    leaves = _leaves(text)
+    if leaves:
+        return leaves[:max_windows]
     parts = [s.strip() for s in _SENT.split(text) if s and s.strip()]
     if len(parts) <= 1:
         return [text]
@@ -134,6 +174,9 @@ def load_detector(path: str | Path, allow_unsigned: bool = False):
     """Load either a DriftGuardClassifier or a HybridDetector from a signed pickle (one verified read)."""
     from driftguard.detector.classifier import DriftGuardClassifier
     path = Path(path)
+    if path.suffix == ".json":          # ensemble config (signed JSON; components verified one by one)
+        from driftguard.detector.ensemble import EnsembleDetector
+        return EnsembleDetector.from_config(path)
     if allow_unsigned:
         data = path.read_bytes()
     else:

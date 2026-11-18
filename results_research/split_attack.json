@@ -1,0 +1,21 @@
+{
+  "whole (upper bound)": {
+    "recall": 0.78,
+    "false_alarm": 0.06
+  },
+  "per_write (either half flagged)": {
+    "recall": 0.78,
+    "false_alarm": 0.1
+  },
+  "with_context (either half or the joined pair)": {
+    "recall": 0.82,
+    "false_alarm": 0.12
+  },
+  "_stealth_pairs": {
+    "n_pairs": 12,
+    "either_half_flagged": 0.9166666666666666,
+    "joined_pair_flagged": 0.9166666666666666,
+    "either_half_or_pair": 0.9166666666666666
+  },
+  "_threshold_5pct_far": 0.7270420200710522
+}

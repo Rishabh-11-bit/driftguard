@@ -13,9 +13,8 @@ from pathlib import Path
 import typer
 
 from app.demo_data import PRESETS, SEED_MEMORIES, daily_history
-from driftguard.detector.classifier import DriftGuardClassifier
 from driftguard.detector.features import SemanticFeatureExtractor
-from driftguard.detector.hybrid import HybridDetector
+from driftguard.detector.hybrid import load_detector
 from driftguard.provenance.schema import make_provenance
 
 app = typer.Typer()
@@ -36,12 +35,12 @@ def expected(name: str) -> int | None:
 def main(
     models: list[Path] = [Path("models/classifier_hard.pkl"), Path("models/classifier_robust.pkl"),
                           Path("models/classifier_v2.pkl"), Path("models/classifier_v3.pkl"),
-                          Path("models/classifier_hybrid.pkl")],
+                          Path("models/classifier_hybrid.pkl"), Path("models/ensemble.json")],
     out: Path = Path("results_research/presets.json"),
 ) -> None:
     ext = SemanticFeatureExtractor()
     hist = daily_history()
-    dets = {m.stem: (HybridDetector if "hybrid" in m.stem else DriftGuardClassifier).load(m) for m in models if m.exists()}
+    dets = {m.stem: load_detector(m) for m in models if m.exists()}
     rows, summary = [], {k: {"correct": 0, "n": 0, "attack_missed": 0, "benign_quarantined": 0} for k in dets}
     for name, vals in PRESETS.items():
         exp = expected(name)
