@@ -27,6 +27,7 @@ import numpy as np
 from driftguard.detector.hybrid import windows
 
 ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
+ENCODER_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"   # pinned Hugging Face commit (supply-chain safety)
 
 
 def _logit(p) -> np.ndarray:
@@ -52,8 +53,8 @@ class FineTunedEncoder:
         from safetensors.torch import load as st_load
         from transformers import AutoModel, AutoTokenizer
         self._torch = torch
-        self.tok = AutoTokenizer.from_pretrained(name)
-        self.enc = AutoModel.from_pretrained(name)
+        self.tok = AutoTokenizer.from_pretrained(name, revision=ENCODER_REVISION)
+        self.enc = AutoModel.from_pretrained(name, revision=ENCODER_REVISION)
         self.head = torch.nn.Linear(self.enc.config.hidden_size, 1)
         state = st_load(weights)
         self.enc.load_state_dict({k[4:]: v for k, v in state.items() if k.startswith("enc.")})
